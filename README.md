@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Labs](https://img.shields.io/badge/labs-3-blue.svg)](.)
 [![Containerlab](https://img.shields.io/badge/containerlab-latest-green.svg)](https://containerlab.dev/)
-[![CI](https://github.com/YOUR-USERNAME/containerlab-free-labs/workflows/Validate%20Labs/badge.svg)](https://github.com/YOUR-USERNAME/containerlab-free-labs/actions)
+[![CI](https://github.com/ciscoittech/containerlab-free-labs/workflows/Validate%20Labs/badge.svg)](https://github.com/ciscoittech/containerlab-free-labs/actions)
 
 **Modern, lightweight network labs using Containerlab and FRR routing**
 
