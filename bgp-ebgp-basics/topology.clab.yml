@@ -1,0 +1,50 @@
+name: bgp-ebgp-basics
+
+topology:
+  nodes:
+    r1:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r1/daemons:/etc/frr/daemons
+        - configs/r1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.1.1.1/24 dev eth1
+        - ip addr add 192.168.1.1/24 dev lo
+
+    r2:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r2/daemons:/etc/frr/daemons
+        - configs/r2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.1.1.2/24 dev eth1
+        - ip addr add 10.2.2.1/24 dev eth2
+        - ip addr add 192.168.2.1/24 dev lo
+
+    r3:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r3/daemons:/etc/frr/daemons
+        - configs/r3/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.2.2.2/24 dev eth1
+        - ip addr add 10.3.3.1/24 dev eth2
+        - ip addr add 192.168.3.1/24 dev lo
+
+    r4:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r4/daemons:/etc/frr/daemons
+        - configs/r4/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.3.3.2/24 dev eth1
+        - ip addr add 192.168.4.1/24 dev lo
+
+  links:
+    - endpoints: ["r1:eth1", "r2:eth1"]  # AS 100 <-> AS 200
+    - endpoints: ["r2:eth2", "r3:eth1"]  # AS 200 <-> AS 300
+    - endpoints: ["r3:eth2", "r4:eth1"]  # AS 300 <-> AS 100

@@ -1,0 +1,24 @@
+{
+  "name": "BGP eBGP Basics Lab",
+  "image": "ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.66.0",
+  "runArgs": [
+    "--privileged",
+    "--network=host"
+  ],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.makefile-tools"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest",
+  "remoteUser": "vscode"
+}

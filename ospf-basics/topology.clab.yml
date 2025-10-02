@@ -1,0 +1,39 @@
+name: ospf-basics
+
+topology:
+  nodes:
+    r1:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r1/daemons:/etc/frr/daemons
+        - configs/r1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.0.1.1/24 dev eth1
+        - ip addr add 10.0.2.1/24 dev eth2
+
+    r2:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r2/daemons:/etc/frr/daemons
+        - configs/r2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.0.1.2/24 dev eth1
+        - ip addr add 10.0.3.2/24 dev eth2
+
+    r3:
+      kind: linux
+      image: frrouting/frr:latest
+      binds:
+        - configs/r3/daemons:/etc/frr/daemons
+        - configs/r3/frr.conf:/etc/frr/frr.conf
+      exec:
+        - ip addr add 10.0.2.3/24 dev eth1
+        - ip addr add 10.0.3.3/24 dev eth2
+        - ip addr add 192.168.100.1/24 dev eth3
+
+  links:
+    - endpoints: ["r1:eth1", "r2:eth1"]  # 10.0.1.0/24
+    - endpoints: ["r1:eth2", "r3:eth1"]  # 10.0.2.0/24
+    - endpoints: ["r2:eth2", "r3:eth2"]  # 10.0.3.0/24

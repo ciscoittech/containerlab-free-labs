@@ -1,0 +1,116 @@
+name: Validate Labs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly to catch image/dependency issues
+    - cron: '0 0 * * 0'
+
+jobs:
+  validate-ospf:
+    name: OSPF Basics Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Pull FRR image
+        run: docker pull frrouting/frr:latest
+
+      - name: Deploy OSPF lab
+        run: |
+          cd ospf-basics
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for OSPF convergence
+        run: sleep 60
+
+      - name: Run validation tests
+        run: |
+          cd ospf-basics
+          chmod +x scripts/validate.sh
+          sudo bash scripts/validate.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd ospf-basics
+          sudo containerlab destroy -t topology.clab.yml || true
+
+  validate-bgp:
+    name: BGP eBGP Basics Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Pull FRR image
+        run: docker pull frrouting/frr:latest
+
+      - name: Deploy BGP lab
+        run: |
+          cd bgp-ebgp-basics
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for BGP convergence
+        run: sleep 60
+
+      - name: Run validation tests
+        run: |
+          cd bgp-ebgp-basics
+          chmod +x scripts/validate.sh
+          sudo bash scripts/validate.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd bgp-ebgp-basics
+          sudo containerlab destroy -t topology.clab.yml || true
+
+  validate-netns:
+    name: Linux Network Namespaces Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Pull Alpine image
+        run: docker pull alpine:latest
+
+      - name: Deploy Linux Namespaces lab
+        run: |
+          cd linux-network-namespaces
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for containers to be ready
+        run: sleep 30
+
+      - name: Run validation tests
+        run: |
+          cd linux-network-namespaces
+          chmod +x scripts/validate.sh
+          sudo bash scripts/validate.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd linux-network-namespaces
+          sudo containerlab destroy -t topology.clab.yml || true
