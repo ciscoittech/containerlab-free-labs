@@ -1,0 +1,30 @@
+name: vyos-firewall-basics
+
+topology:
+  nodes:
+    fw1:
+      kind: linux
+      image: ghcr.io/sever-sever/vyos-container:latest
+      binds:
+        - configs/fw1.conf:/opt/vyatta/etc/config/config.boot:ro
+      exec:
+        - sleep 10  # Wait for VyOS to initialize
+
+    client1:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - ip addr add 192.168.100.10/24 dev eth1
+        - ip route add default via 192.168.100.1
+        - apk add --no-cache curl
+
+    internet:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - ip addr add 172.16.10.100/24 dev eth1
+        - ip route add 192.168.100.0/24 via 172.16.10.1
+
+  links:
+    - endpoints: ["fw1:eth1", "internet:eth1"]   # WAN zone
+    - endpoints: ["fw1:eth2", "client1:eth1"]    # LAN zone
