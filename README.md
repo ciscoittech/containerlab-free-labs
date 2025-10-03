@@ -7,7 +7,7 @@
 
 **Modern, lightweight network labs using Containerlab and FRR routing**
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?quickstart=1)
+[![Run in Codespaces](.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?quickstart=1)
 
 > Learn OSPF, BGP, and Linux networking with hands-on containerized labs. No VMs required!
 
