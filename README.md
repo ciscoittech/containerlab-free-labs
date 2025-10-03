@@ -81,16 +81,6 @@ sudo containerlab destroy -t topology.clab.yml
 2. **OSPF Basics**: Learn link-state routing protocols
 3. **BGP eBGP Basics**: Understand internet routing fundamentals
 
-## 🎯 Want More Advanced Labs?
-
-These free labs are perfect for learning fundamentals. Looking for:
-- 🔥 **Troubleshooting scenarios** with embedded issues
-- 🔥 **MPLS, EVPN, SR Linux automation**
-- 🔥 **Instant browser-based labs** (no local setup)
-- 🔥 **Structured certification tracks**
-
-Check out **[Your Platform Name]** - Professional network labs in your browser.
-
 ## 🤝 Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
