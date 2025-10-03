@@ -468,7 +468,7 @@ A: Absolutely! FRR uses Cisco-like syntax. Perfect for practicing OSPF, BGP, and
 A: Yes! MIT License. Use for learning, teaching, or building your own projects.
 
 **Q: Where are the advanced labs (MPLS, EVPN)?**
-A: Coming soon! These free labs focus on fundamentals. Advanced labs will be available in a paid tier (with instant browser access).
+A: Coming soon! These free labs focus on fundamentals. We're planning to add more advanced community-contributed labs. See [CONTRIBUTING.md](CONTRIBUTING.md) if you'd like to help!
 
 ---
 
