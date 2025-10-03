@@ -327,7 +327,3 @@ Now that you understand network namespaces, try:
 - [Linux Network Namespaces](https://man7.org/linux/man-pages/man7/network_namespaces.7.html)
 - [Containerlab Documentation](https://containerlab.dev/)
 - [Understanding veth Pairs](https://man7.org/linux/man-pages/man4/veth.4.html)
-
----
-
-**Want more advanced labs?** Check out our premium platform with MPLS, SR Linux automation, and more!

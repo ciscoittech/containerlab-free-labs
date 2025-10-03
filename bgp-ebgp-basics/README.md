@@ -278,16 +278,11 @@ sudo containerlab destroy -t topology.clab.yml
 ## Next Steps
 
 After completing this lab, try:
-- **iBGP Internal BGP** (Premium lab) - Learn iBGP full-mesh and route reflection
-- **BGP Route Reflection** (Premium lab) - Reduce iBGP mesh complexity
-- **BGP Communities** (Premium lab) - Advanced route tagging and filtering
+- **OSPF Basics** - Learn link-state routing protocols
+- **Linux Network Namespaces** - Understand container networking fundamentals
 
 ## Resources
 
 - [BGP RFC 4271](https://www.rfc-editor.org/rfc/rfc4271)
 - [FRRouting BGP Documentation](https://docs.frrouting.org/en/latest/bgp.html)
 - [BGP Best Practices](https://www.cisco.com/c/en/us/support/docs/ip/border-gateway-protocol-bgp/13753-25.html)
-
----
-
-**Want more advanced labs?** Check out our premium platform with iBGP, MPLS L3VPN, SR Linux automation, and more!

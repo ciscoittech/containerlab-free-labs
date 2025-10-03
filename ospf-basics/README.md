@@ -230,15 +230,10 @@ sudo containerlab destroy -t topology.clab.yml
 
 After completing this lab, try:
 - **BGP eBGP Basics** - Learn internet routing with BGP
-- **OSPF Multi-Area** (Premium lab) - Complex multi-area OSPF designs
-- **OSPF Troubleshooting** (Premium lab) - Embedded troubleshooting scenarios
+- **Linux Network Namespaces** - Understand container networking fundamentals
 
 ## Resources
 
 - [OSPF RFC 2328](https://www.rfc-editor.org/rfc/rfc2328)
 - [FRRouting OSPF Documentation](https://docs.frrouting.org/en/latest/ospfd.html)
 - [Containerlab Documentation](https://containerlab.dev/)
-
----
-
-**Want more advanced labs?** Check out our premium platform with troubleshooting scenarios, MPLS, SR Linux automation, and more!
