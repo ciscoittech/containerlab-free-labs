@@ -1,0 +1,21 @@
+name: zero-trust-poc
+
+topology:
+  nodes:
+    firewall:
+      kind: linux
+      image: ghcr.io/sever-sever/vyos-container:latest
+      binds:
+        - configs/firewall.conf:/opt/vyatta/etc/config/config.boot:ro
+
+    client:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - ip addr add 172.16.1.100/24 dev eth1
+        - ip route add default via 172.16.1.1
+        - apk add --no-cache curl
+
+  links:
+    - endpoints: ["firewall:eth1", "client:eth1"]
+    - endpoints: ["firewall:eth2", "host:zt-web-1"]

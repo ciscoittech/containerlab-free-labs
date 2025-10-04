@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: zt-mongodb
+    networks:
+      - internal
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=zero_trust
+
+  identity:
+    build: ./services/identity
+    container_name: zt-identity
+    ports:
+      - "8443:8443"
+    networks:
+      - internal
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - JWT_SECRET_KEY=demo-secret-change-in-production
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  web:
+    build: ./services/web
+    container_name: zt-web
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    depends_on:
+      - identity
+    restart: unless-stopped
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mongo-data:
