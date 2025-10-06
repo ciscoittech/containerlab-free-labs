@@ -1,7 +1,7 @@
 # BGP eBGP Basics Lab - SSH Enabled ✅
 
-**Date Updated**: 2025-10-06
-**Status**: ✅ SSH Access Fully Enabled
+**Date Updated**: 2025-10-06 (Updated with auto-vtysh)
+**Status**: ✅ SSH Access Fully Enabled with Auto-Login to Router CLI
 
 ---
 
@@ -18,7 +18,8 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 ### After (New) ✅
 - ✅ Direct SSH access to all 4 routers
 - ✅ Unique SSH ports per router (2211-2214)
-- ✅ Realistic network experience
+- ✅ **Auto-login to router CLI** - SSH drops you directly into vtysh (like real routers!)
+- ✅ Realistic network experience (no bash shell, straight to CLI)
 - ✅ Easy config management
 - ✅ Works from code-server/VS Code terminal
 
@@ -41,12 +42,12 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 
 ## Example Usage
 
-### SSH to r1 (AS 100)
+### SSH to r1 (AS 100) - Auto-Login to Router CLI
 ```bash
 ssh -p 2211 admin@localhost
 # Password: NokiaSrl1!
 
-admin@r1$ vtysh
+# You land DIRECTLY in router CLI - no bash shell!
 r1# show ip bgp summary
 r1# show ip bgp
 r1# show ip route
@@ -54,11 +55,14 @@ r1# configure terminal
 r1(config)# router bgp 100
 ```
 
+✨ **NEW**: SSH auto-starts vtysh - behaves exactly like real Cisco/Juniper routers!
+
 ### SSH to r2 (AS 200 - Transit)
 ```bash
 ssh -p 2212 admin@localhost
+# Password: NokiaSrl1!
 
-admin@r2$ vtysh
+# Direct router CLI access
 r2# show ip bgp neighbors
 r2# show ip bgp neighbors 10.1.1.1 advertised-routes
 ```
@@ -126,11 +130,27 @@ vtysh -c "show ip bgp summary"
 
 ## Benefits
 
-✅ **Realistic Experience** - SSH to routers like real hardware
+✅ **Realistic Experience** - SSH to routers like real hardware (direct CLI login!)
 ✅ **Browser-Friendly** - Works in code-server terminal
 ✅ **Easy Config Management** - Copy/paste configs easily
 ✅ **Multi-User** - Multiple students can SSH simultaneously
 ✅ **Tool Compatible** - Works with Ansible, Nornir, etc.
+✅ **Authentic Workflow** - No bash shell, just router CLI like Cisco/Juniper
+
+---
+
+## Troubleshooting
+
+**Need bash shell access?** Use docker exec to bypass SSH auto-login:
+```bash
+docker exec -it clab-bgp-ebgp-basics-r1 bash
+```
+
+**Need to exit?** Just type `exit` - it exits SSH completely (not just vtysh):
+```bash
+r1# exit
+# You're back at your terminal
+```
 
 ---
 

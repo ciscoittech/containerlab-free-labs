@@ -104,15 +104,18 @@ Each router has SSH enabled on a unique host port:
 - Username: `admin`
 - Password: `NokiaSrl1!`
 
-**Example - SSH to r1**:
+**Example - SSH to r1** (lands directly in router CLI):
 ```bash
 ssh -p 2211 admin@localhost
 # Password: NokiaSrl1!
 
-admin@r1$ vtysh
+# You land DIRECTLY in router CLI - no need to type 'vtysh'!
 r1# show ip bgp summary
 r1# show ip route
+r1# show ip bgp neighbors
 ```
+
+✨ **Auto-Login**: SSH drops you directly into the router CLI like real Cisco/Juniper routers!
 
 ### Alternative: Docker Exec Access
 
