@@ -25,7 +25,7 @@ code .
 
 # 2. When VS Code opens, click "Reopen in Container"
 #    - First time will take 2-3 minutes to build devcontainer
-#    - Pulls ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.66.0
+#    - Pulls ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0
 #    - Runs postCreateCommand: pulls frrouting/frr:latest
 
 # 3. Once inside devcontainer, run deployment
@@ -198,7 +198,7 @@ docker exec -it clab-netns-basics-client1 ping -c 3 10.0.3.10
 docker ps
 
 # Pull devcontainer image manually
-docker pull ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.66.0
+docker pull ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0
 
 # Restart VS Code and try again
 ```

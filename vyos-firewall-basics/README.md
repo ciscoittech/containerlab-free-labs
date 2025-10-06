@@ -1,6 +1,6 @@
 # VyOS Firewall Basics Lab
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/YOUR-USERNAME/containerlab-free-labs?devcontainer_path=.devcontainer%2Fdevcontainer.json&quickstart=1)
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=vyos-firewall-basics/.devcontainer/devcontainer.json&quickstart=1)
 
 ## Overview
 

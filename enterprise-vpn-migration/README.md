@@ -1,6 +1,6 @@
 # Enterprise VPN Migration Lab
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new?quickstart=1&devcontainer_path=.devcontainer%2Fdevcontainer.json)
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=enterprise-vpn-migration/.devcontainer/devcontainer.json&quickstart=1)
 
 A production-grade enterprise network lab simulating a real-world VPN IP migration scenario with minimal downtime requirements. This lab challenges you to plan and execute a critical infrastructure change while maintaining service availability across two geographically separated sites.
 

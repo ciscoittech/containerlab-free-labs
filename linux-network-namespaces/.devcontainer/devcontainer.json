@@ -11,6 +11,10 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "srl-labs.vscode-containerlab",
+        "ms-vscode.vscode-yaml",
+        "redhat.vscode-yaml",
+        "ms-python.python",
         "ms-azuretools.vscode-docker",
         "ms-vscode.makefile-tools"
       ],

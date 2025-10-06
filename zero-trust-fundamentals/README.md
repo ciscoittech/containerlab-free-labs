@@ -1,5 +1,7 @@
 # Zero Trust Fundamentals - Proof of Concept
 
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=zero-trust-fundamentals/.devcontainer/devcontainer.json&quickstart=1)
+
 **Status:** 🚧 POC - Simplified demonstration of core Zero Trust principles
 
 ## Overview

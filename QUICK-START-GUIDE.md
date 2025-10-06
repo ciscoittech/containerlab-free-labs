@@ -45,7 +45,7 @@ Deploying Linux Network Namespaces Lab
 =========================================
 
 Starting containerlab deployment...
-INFO[0000] Containerlab v0.66.0 started
+INFO[0000] Containerlab v0.68.0 started
 INFO[0001] Parsing & checking topology file: topology.clab.yml
 INFO[0002] Creating lab directory: /root/clab-netns-basics
 INFO[0003] Creating container: "router"
