@@ -54,10 +54,11 @@ RUN mkdir -p /etc/frr && \
     chmod 640 /etc/frr/daemons
 
 # Add vtysh to admin's PATH and auto-start vtysh on SSH login
-RUN echo 'alias vtysh="sudo /usr/bin/vtysh"' >> /home/admin/.bashrc && \
-    echo 'export PATH=$PATH:/usr/local/bin' >> /home/admin/.bashrc && \
-    echo '# Auto-start vtysh on SSH login (like real routers)' >> /home/admin/.bashrc && \
-    echo 'exec sudo /usr/bin/vtysh' >> /home/admin/.bashrc
+# Use .bash_profile for login shells (SSH) instead of .bashrc
+RUN echo 'alias vtysh="sudo /usr/bin/vtysh"' >> /home/admin/.bash_profile && \
+    echo 'export PATH=$PATH:/usr/local/bin' >> /home/admin/.bash_profile && \
+    echo '# Auto-start vtysh on SSH login (like real routers)' >> /home/admin/.bash_profile && \
+    echo 'exec sudo /usr/bin/vtysh' >> /home/admin/.bash_profile
 
 # Expose SSH port
 EXPOSE 22
