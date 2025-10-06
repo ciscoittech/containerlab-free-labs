@@ -1,6 +1,15 @@
 name: ospf-basics
 
+mgmt:
+  network: clab-mgmt
+  ipv4-subnet: 172.20.20.0/24
+  ipv6-subnet: 3fff:172:20:20::/64
+
 topology:
+  defaults:
+    env:
+      CLAB_SSH_CONNECTION: cisco@%h:%p
+
   nodes:
     r1:
       kind: linux

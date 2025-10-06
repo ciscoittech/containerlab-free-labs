@@ -9,6 +9,10 @@ topology:
     linux:
       cmd: sh
 
+  defaults:
+    env:
+      CLAB_SSH_CONNECTION: cisco@%h:%p
+
   nodes:
     #########################################################################
     # Site A - Main Office (Chicago, IL)
