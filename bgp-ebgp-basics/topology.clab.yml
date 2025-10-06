@@ -4,45 +4,69 @@ topology:
   nodes:
     r1:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r1/daemons:/etc/frr/daemons
         - configs/r1/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2211:22  # SSH access on host port 2211
       exec:
         - ip addr add 10.1.1.1/24 dev eth1
         - ip addr add 192.168.1.1/24 dev lo
+      labels:
+        lab-name: "BGP eBGP Basics"
+        router-name: "R1"
+        as-number: "100"
 
     r2:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r2/daemons:/etc/frr/daemons
         - configs/r2/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2212:22  # SSH access on host port 2212
       exec:
         - ip addr add 10.1.1.2/24 dev eth1
         - ip addr add 10.2.2.1/24 dev eth2
         - ip addr add 192.168.2.1/24 dev lo
+      labels:
+        lab-name: "BGP eBGP Basics"
+        router-name: "R2"
+        as-number: "200"
 
     r3:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r3/daemons:/etc/frr/daemons
         - configs/r3/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2213:22  # SSH access on host port 2213
       exec:
         - ip addr add 10.2.2.2/24 dev eth1
         - ip addr add 10.3.3.1/24 dev eth2
         - ip addr add 192.168.3.1/24 dev lo
+      labels:
+        lab-name: "BGP eBGP Basics"
+        router-name: "R3"
+        as-number: "300"
 
     r4:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r4/daemons:/etc/frr/daemons
         - configs/r4/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2214:22  # SSH access on host port 2214
       exec:
         - ip addr add 10.3.3.2/24 dev eth1
         - ip addr add 192.168.4.1/24 dev lo
+      labels:
+        lab-name: "BGP eBGP Basics"
+        router-name: "R4"
+        as-number: "100"
 
   links:
     - endpoints: ["r1:eth1", "r2:eth1"]  # AS 100 <-> AS 200

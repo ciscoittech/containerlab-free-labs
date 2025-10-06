@@ -70,9 +70,33 @@ sudo containerlab destroy -t topology.clab.yml
 
 ## Accessing Lab Devices
 
-**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+✨ **NEW**: This lab now uses custom FRR SSH image for direct SSH access to routers!
 
-### Access Router CLI (vtysh)
+### SSH Access to Routers (Recommended)
+
+Each router has SSH enabled on a unique host port:
+
+| Router | SSH Port | SSH Command |
+|--------|----------|-------------|
+| **r1** | 2221 | `ssh -p 2221 admin@localhost` |
+| **r2** | 2222 | `ssh -p 2222 admin@localhost` |
+| **r3** | 2223 | `ssh -p 2223 admin@localhost` |
+
+**Credentials**:
+- Username: `admin`
+- Password: `NokiaSrl1!`
+
+**Example - SSH to r1**:
+```bash
+ssh -p 2221 admin@localhost
+# Password: NokiaSrl1!
+
+admin@r1$ vtysh
+r1# show ip ospf neighbor
+r1# show ip route
+```
+
+### Alternative: Docker Exec Access
 
 **Interactive mode** (Cisco-like CLI):
 ```bash
@@ -91,13 +115,13 @@ docker exec -it clab-ospf-basics-r1 bash
 
 ### Common Commands
 
-| Task | Command |
-|------|---------|
-| Check OSPF neighbors | `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf neighbor"` |
-| View OSPF routes | `docker exec clab-ospf-basics-r1 vtysh -c "show ip route ospf"` |
-| Check OSPF database | `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf database"` |
-| View routing table | `docker exec clab-ospf-basics-r1 vtysh -c "show ip route"` |
-| Show configuration | `docker exec clab-ospf-basics-r1 vtysh -c "show run"` |
+| Task | Command (via SSH) |
+|------|-------------------|
+| Check OSPF neighbors | `vtysh -c "show ip ospf neighbor"` |
+| View OSPF routes | `vtysh -c "show ip route ospf"` |
+| Check OSPF database | `vtysh -c "show ip ospf database"` |
+| View routing table | `vtysh -c "show ip route"` |
+| Show configuration | `vtysh -c "show run"` |
 
 **Why no SSH?**
 - ✅ Faster container startup (no SSH daemon)

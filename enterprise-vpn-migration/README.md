@@ -99,9 +99,38 @@ If any tests fail, troubleshoot before proceeding with the migration exercise.
 
 ## Accessing Lab Devices
 
-**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+✨ **NEW**: This lab now uses custom FRR SSH image for direct SSH access to routers!
 
-### Access Router CLI (vtysh)
+### SSH Access to Routers (Recommended)
+
+Each FRR router has SSH enabled on a unique host port:
+
+| Router | Site | SSH Port | SSH Command |
+|--------|------|----------|-------------|
+| **router-a1** | Chicago | 2231 | `ssh -p 2231 admin@localhost` |
+| **router-a2** | Chicago | 2232 | `ssh -p 2232 admin@localhost` |
+| **router-b1** | Austin | 2233 | `ssh -p 2233 admin@localhost` |
+| **router-b2** | Austin | 2234 | `ssh -p 2234 admin@localhost` |
+| **internet-core** | ISP Backbone | 2235 | `ssh -p 2235 admin@localhost` |
+
+**Credentials**:
+- Username: `admin`
+- Password: `NokiaSrl1!`
+
+**Example - SSH to router-a1**:
+```bash
+ssh -p 2231 admin@localhost
+# Password: NokiaSrl1!
+
+admin@router-a1$ vtysh
+router-a1# show ip ospf neighbor
+router-a1# show ip bgp summary
+router-a1# show ip route
+```
+
+### Alternative: Docker Exec Access
+
+**Access Router CLI (vtysh)**
 
 **Interactive mode** (Cisco-like CLI):
 ```bash

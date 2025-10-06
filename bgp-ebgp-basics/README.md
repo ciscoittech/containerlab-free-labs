@@ -41,6 +41,18 @@ AS 100          AS 200          AS 300          AS 100
 | r3     | 300 | 3.3.3.3   | 192.168.3.1/24 | r2 (AS 200), r4 (AS 100) |
 | r4     | 100 | 4.4.4.4   | 192.168.4.1/24 | r3 (AS 300) |
 
+## Prerequisites
+
+**Required**: Custom FRR SSH image for SSH access to routers.
+
+If you haven't built it yet:
+```bash
+cd /Users/bhunt/development/claude/sr_linux/labs/.claude-library/docker-images/frr-ssh
+docker buildx build --platform linux/amd64 --load -t frr-ssh:latest .
+```
+
+Takes ~2 minutes first time. See [frr-ssh README](../../sr_linux/labs/.claude-library/docker-images/frr-ssh/README.md) for details.
+
 ## Quick Start
 
 ### Option 1: VS Code Devcontainer (Recommended)
@@ -75,9 +87,34 @@ sudo containerlab destroy -t topology.clab.yml
 
 ## Accessing Lab Devices
 
-**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+✨ **NEW**: This lab now uses custom FRR SSH image for direct SSH access to routers!
 
-### Access Router CLI (vtysh)
+### SSH Access to Routers (Recommended)
+
+Each router has SSH enabled on a unique host port:
+
+| Router | AS  | SSH Port | SSH Command |
+|--------|-----|----------|-------------|
+| **r1** | 100 | 2211 | `ssh -p 2211 admin@localhost` |
+| **r2** | 200 | 2212 | `ssh -p 2212 admin@localhost` |
+| **r3** | 300 | 2213 | `ssh -p 2213 admin@localhost` |
+| **r4** | 100 | 2214 | `ssh -p 2214 admin@localhost` |
+
+**Credentials**:
+- Username: `admin`
+- Password: `NokiaSrl1!`
+
+**Example - SSH to r1**:
+```bash
+ssh -p 2211 admin@localhost
+# Password: NokiaSrl1!
+
+admin@r1$ vtysh
+r1# show ip bgp summary
+r1# show ip route
+```
+
+### Alternative: Docker Exec Access
 
 **Interactive mode** (Cisco-like CLI):
 ```bash

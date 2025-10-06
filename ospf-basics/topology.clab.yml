@@ -4,34 +4,49 @@ topology:
   nodes:
     r1:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r1/daemons:/etc/frr/daemons
         - configs/r1/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2221:22  # SSH access
       exec:
         - ip addr add 10.0.1.1/24 dev eth1
         - ip addr add 10.0.2.1/24 dev eth2
+      labels:
+        lab-name: "OSPF Basics"
+        router-name: "R1"
 
     r2:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r2/daemons:/etc/frr/daemons
         - configs/r2/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2222:22  # SSH access
       exec:
         - ip addr add 10.0.1.2/24 dev eth1
         - ip addr add 10.0.3.2/24 dev eth2
+      labels:
+        lab-name: "OSPF Basics"
+        router-name: "R2"
 
     r3:
       kind: linux
-      image: frrouting/frr:latest
+      image: frr-ssh:latest
       binds:
         - configs/r3/daemons:/etc/frr/daemons
         - configs/r3/frr.conf:/etc/frr/frr.conf
+      ports:
+        - 2223:22  # SSH access
       exec:
         - ip addr add 10.0.2.3/24 dev eth1
         - ip addr add 10.0.3.3/24 dev eth2
         - ip addr add 192.168.100.1/24 dev eth3
+      labels:
+        lab-name: "OSPF Basics"
+        router-name: "R3"
 
   links:
     - endpoints: ["r1:eth1", "r2:eth1"]  # 10.0.1.0/24
