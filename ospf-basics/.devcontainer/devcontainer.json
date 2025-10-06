@@ -23,6 +23,6 @@
       }
     }
   },
-  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest",
+  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest && bash /workspaces/containerlab-free-labs/build-frr-ssh.sh",
   "remoteUser": "vscode"
 }

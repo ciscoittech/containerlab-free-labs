@@ -20,5 +20,5 @@
       }
     }
   },
-  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest && docker pull alpine:latest"
+  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest && docker pull alpine:latest && bash /workspaces/containerlab-free-labs/build-frr-ssh.sh"
 }

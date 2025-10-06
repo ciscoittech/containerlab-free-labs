@@ -1,23 +1,26 @@
 # GitHub Codespaces Quick Start 🚀
 
-**First time setup in Codespaces? Do this first!**
+**Zero setup required - everything builds automatically!**
 
 ---
 
-## Step 1: Build the FRR SSH Image
+## Step 1: Wait for Container to Build
 
-The labs require a custom `frr-ssh:latest` image with SSH auto-login enabled.
+When you first open the Codespace, the `frr-ssh:latest` image builds automatically in the background.
 
-**Run this command in Codespaces terminal:**
-```bash
-./build-frr-ssh.sh
-```
+**What's happening:**
+- Codespace starts (~30 seconds)
+- Pulls base images (frrouting/frr, alpine)
+- Builds frr-ssh image with SSH support (~2-3 minutes)
+- You'll see progress in the terminal output
 
-Takes ~2-3 minutes first time. Output should end with:
+**Look for this message:**
 ```
 ✅ frr-ssh:latest image built successfully!
 ✅ Ready to deploy labs!
 ```
+
+**Note:** You can start working immediately - the build happens in the background!
 
 ---
 
@@ -36,7 +39,7 @@ sleep 10
 
 ---
 
-## Step 3: Test SSH Auto-Login
+## Step 3: Test SSH Auto-Login (admin/cisco)
 
 **SSH to router r1:**
 ```bash
