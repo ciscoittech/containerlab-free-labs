@@ -43,6 +43,31 @@ Explore how containerlab uses Linux network namespaces to create isolated networ
 
 [**→ Start Linux Namespaces Lab**](linux-network-namespaces/)
 
+## ✨ SSH Access to Routers
+
+All labs include **SSH access with auto-login to router CLI** - just like real Cisco/Juniper routers!
+
+**Credentials:**
+- Username: `admin`
+- Password: `cisco`
+
+**Access methods:**
+1. **VS Code Extension** (easiest) - Right-click container → SSH
+2. **Port mapping** - `ssh -p 2221 admin@localhost`
+3. **Container name** - `ssh admin@clab-ospf-basics-r1`
+
+**You land directly at the router CLI:**
+```
+$ ssh -p 2221 admin@localhost
+Password: cisco
+
+r1#  ← Router CLI (not bash shell!)
+r1# show ip ospf neighbor
+r1# show ip route
+```
+
+See [SSH-SETUP-COMPLETE.md](SSH-SETUP-COMPLETE.md) for complete documentation.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -62,6 +87,9 @@ containerlab version
 git clone https://github.com/ciscoittech/containerlab-free-labs.git
 cd containerlab-free-labs
 
+# Build frr-ssh image (first time only)
+./build-frr-ssh.sh
+
 # Option 1: Run in VS Code with devcontainer (recommended)
 cd ospf-basics
 code .  # Click "Reopen in Container"
@@ -70,7 +98,12 @@ code .  # Click "Reopen in Container"
 cd ospf-basics
 sudo containerlab deploy -t topology.clab.yml
 
-# Access routers
+# Access routers via SSH (recommended)
+ssh -p 2221 admin@localhost  # OSPF r1
+# Password: cisco
+# Lands directly at router CLI: r1#
+
+# Alternative: Docker exec
 docker exec -it clab-ospf-basics-r1 vtysh
 
 # Cleanup
