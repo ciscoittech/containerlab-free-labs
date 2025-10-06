@@ -1,0 +1,344 @@
+name: enterprise-vpn-migration
+
+mgmt:
+  network: vpn-mgmt
+  ipv4_subnet: 172.20.20.0/24
+
+topology:
+  kinds:
+    linux:
+      cmd: sh
+
+  nodes:
+    #########################################################################
+    # Site A - Main Office (Chicago, IL)
+    #########################################################################
+
+    # ISP-A Gateway (simulated ISP edge for Site A)
+    isp-a:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 100.64.0.1/24 dev eth2
+        - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
+        - ip route add default via 100.64.0.254
+        - apk add --no-cache iptables tcpdump curl
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Router-A1 (Edge Router, VPN Endpoint, BGP)
+    router-a1:
+      kind: linux
+      image: frrouting/frr:latest
+      exec:
+        # Enable IP forwarding
+        - sysctl -w net.ipv4.ip_forward=1
+        - sysctl -w net.ipv4.conf.all.rp_filter=0
+        - sysctl -w net.ipv4.conf.default.rp_filter=0
+        # Configure WAN IP (OLD - will be migrated to 192.0.2.10)
+        - ip addr add 203.0.113.10/30 dev eth2
+        # Configure GRE tunnel (will use OLD WAN IP initially)
+        - ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+        - ip addr add 172.16.0.1/30 dev gre0
+        - ip link set gre0 up
+        - ip link set gre0 mtu 1400
+        # Configure BGP peering IP
+        - ip addr add 100.64.0.10/24 dev eth3
+        # Start FRR daemons
+        - /usr/lib/frr/frrinit.sh start
+      binds:
+        - ./configs/router-a1/frr.conf:/etc/frr/frr.conf:ro
+        - ./configs/router-a1/daemons:/etc/frr/daemons:ro
+        - /etc/localtime:/etc/localtime:ro
+
+    # Router-A2 (Core Router, OSPF)
+    router-a2:
+      kind: linux
+      image: frrouting/frr:latest
+      exec:
+        - sysctl -w net.ipv4.ip_forward=1
+        # Configure management network
+        - ip addr add 10.1.10.1/24 dev eth1
+        # Configure server network gateway
+        - ip addr add 10.1.20.1/24 dev eth2
+        # Start FRR daemons
+        - /usr/lib/frr/frrinit.sh start
+      binds:
+        - ./configs/router-a2/frr.conf:/etc/frr/frr.conf:ro
+        - ./configs/router-a2/daemons:/etc/frr/daemons:ro
+        - /etc/localtime:/etc/localtime:ro
+
+    # Firewall-A (Zone-based firewall with VyOS)
+    firewall-a:
+      kind: linux
+      image: ghcr.io/sever-sever/vyos-container:latest
+      cmd: /sbin/init
+      exec:
+        # Configure interfaces
+        - ip addr add 10.1.20.2/24 dev eth1
+        - ip addr add 10.1.20.3/24 dev eth2  # Web-A segment
+        - ip addr add 10.1.20.4/24 dev eth3  # DNS-A segment
+        - ip addr add 10.1.20.5/24 dev eth4  # LDAP-A segment
+        - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
+        - ip route add default via 10.1.20.1
+        - sysctl -w net.ipv4.ip_forward=1
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Web-A (nginx web server)
+    web-a:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 10.1.20.10/24 dev eth1
+        - ip route add default via 10.1.20.3
+        - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
+        - mkdir -p /run/nginx
+        - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
+        - nginx
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # DNS-A (dnsmasq DNS server)
+    dns-a:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 10.1.20.11/24 dev eth1
+        - ip route add default via 10.1.20.4
+        - apk add --no-cache dnsmasq bind-tools
+        # Configure dnsmasq
+        - echo "address=/web-a.site-a.local/10.1.20.10" > /etc/dnsmasq.conf
+        - echo "address=/web-b.site-b.local/10.2.20.10" >> /etc/dnsmasq.conf
+        - echo "address=/dns-a.site-a.local/10.1.20.11" >> /etc/dnsmasq.conf
+        - echo "address=/ldap-a.site-a.local/10.1.20.12" >> /etc/dnsmasq.conf
+        - dnsmasq --no-daemon --log-queries &
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # LDAP-A (OpenLDAP directory server)
+    ldap-a:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 10.1.20.12/24 dev eth1
+        - ip route add default via 10.1.20.5
+        - apk add --no-cache openldap openldap-back-mdb openldap-clients netcat-openbsd
+        # Start slapd on port 389
+        - mkdir -p /var/lib/openldap/openldap-data
+        - chown ldap:ldap /var/lib/openldap/openldap-data
+        # Note: Full LDAP config would be in production, simplified for lab
+        - netcat -l -p 389 &  # Simple listener for connectivity testing
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Monitor-A (Grafana monitoring dashboard)
+    monitor-a:
+      kind: linux
+      image: grafana/grafana:latest
+      env:
+        GF_INSTALL_PLUGINS: ""
+        GF_SERVER_HTTP_PORT: "3000"
+      exec:
+        - ip addr add 10.1.20.13/24 dev eth1
+        - ip route add default via 10.1.20.6
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    #########################################################################
+    # Site B - Remote Office (Austin, TX)
+    #########################################################################
+
+    # ISP-B Gateway (simulated ISP edge for Site B)
+    isp-b:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 100.64.0.2/24 dev eth2
+        - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
+        - ip route add default via 100.64.0.254
+        - apk add --no-cache iptables tcpdump curl
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Router-B1 (Edge Router, VPN Endpoint, BGP)
+    router-b1:
+      kind: linux
+      image: frrouting/frr:latest
+      exec:
+        # Enable IP forwarding
+        - sysctl -w net.ipv4.ip_forward=1
+        - sysctl -w net.ipv4.conf.all.rp_filter=0
+        - sysctl -w net.ipv4.conf.default.rp_filter=0
+        # Configure WAN IP (OLD - will be migrated to 192.0.2.20)
+        - ip addr add 198.51.100.10/30 dev eth2
+        # Configure GRE tunnel (will use OLD WAN IP initially)
+        - ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+        - ip addr add 172.16.0.2/30 dev gre0
+        - ip link set gre0 up
+        - ip link set gre0 mtu 1400
+        # Configure BGP peering IP
+        - ip addr add 100.64.0.20/24 dev eth3
+        # Start FRR daemons
+        - /usr/lib/frr/frrinit.sh start
+      binds:
+        - ./configs/router-b1/frr.conf:/etc/frr/frr.conf:ro
+        - ./configs/router-b1/daemons:/etc/frr/daemons:ro
+        - /etc/localtime:/etc/localtime:ro
+
+    # Router-B2 (Core Router, OSPF)
+    router-b2:
+      kind: linux
+      image: frrouting/frr:latest
+      exec:
+        - sysctl -w net.ipv4.ip_forward=1
+        # Configure management network
+        - ip addr add 10.2.10.1/24 dev eth1
+        # Configure server network gateway
+        - ip addr add 10.2.20.1/24 dev eth2
+        # Start FRR daemons
+        - /usr/lib/frr/frrinit.sh start
+      binds:
+        - ./configs/router-b2/frr.conf:/etc/frr/frr.conf:ro
+        - ./configs/router-b2/daemons:/etc/frr/daemons:ro
+        - /etc/localtime:/etc/localtime:ro
+
+    # Firewall-B (Zone-based firewall with VyOS)
+    firewall-b:
+      kind: linux
+      image: ghcr.io/sever-sever/vyos-container:latest
+      cmd: /sbin/init
+      exec:
+        # Configure interfaces
+        - ip addr add 10.2.20.2/24 dev eth1
+        - ip addr add 10.2.20.3/24 dev eth2  # Web-B segment
+        - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
+        - ip route add default via 10.2.20.1
+        - sysctl -w net.ipv4.ip_forward=1
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Web-B (nginx web server)
+    web-b:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 10.2.20.10/24 dev eth1
+        - ip route add default via 10.2.20.3
+        - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
+        - mkdir -p /run/nginx
+        - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
+        - nginx
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    # Server-B (general application server)
+    server-b:
+      kind: linux
+      image: alpine:3.18
+      exec:
+        - ip addr add 10.2.20.11/24 dev eth1
+        - ip route add default via 10.2.20.4
+        - apk add --no-cache curl bind-tools netcat-openbsd traceroute
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+    #########################################################################
+    # Internet Backbone (Simulated ISP Core)
+    #########################################################################
+
+    # Internet-Core (simulated ISP backbone router)
+    internet-core:
+      kind: linux
+      image: frrouting/frr:latest
+      exec:
+        - sysctl -w net.ipv4.ip_forward=1
+        # Configure ISP backbone network
+        - ip addr add 100.64.0.254/24 dev eth1
+        - ip addr add 100.64.0.253/24 dev eth2
+        # Configure BGP peering IPs
+        - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
+        - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
+        # Start FRR daemons
+        - /usr/lib/frr/frrinit.sh start
+      binds:
+        - ./configs/internet-core/frr.conf:/etc/frr/frr.conf:ro
+        - ./configs/internet-core/daemons:/etc/frr/daemons:ro
+        - /etc/localtime:/etc/localtime:ro
+
+    # Netbox (IPAM and network documentation)
+    netbox:
+      kind: linux
+      image: netboxcommunity/netbox:latest
+      env:
+        SKIP_SUPERUSER: "true"
+        DB_HOST: "localhost"
+        DB_NAME: "netbox"
+        DB_USER: "netbox"
+        DB_PASSWORD: "netbox"
+        REDIS_HOST: "localhost"
+        SECRET_KEY: "r8OwDz)YPf1K*Fh@m@T!3D8BcQnN4MfWQ1w-kF%7EX0rJU9uGBL8"
+      exec:
+        - ip addr add 10.1.20.14/24 dev eth1
+        - ip route add default via 10.1.20.1
+      binds:
+        - /etc/localtime:/etc/localtime:ro
+
+  links:
+    #########################################################################
+    # Site A Internal Links
+    #########################################################################
+
+    # OSPF link: router-a1 ↔ router-a2
+    - endpoints: ["router-a1:eth1", "router-a2:eth1"]
+
+    # LAN uplink: router-a2 ↔ firewall-a
+    - endpoints: ["router-a2:eth2", "firewall-a:eth1"]
+
+    # Server segments (firewall-a as hub)
+    - endpoints: ["firewall-a:eth2", "web-a:eth1"]
+    - endpoints: ["firewall-a:eth3", "dns-a:eth1"]
+    - endpoints: ["firewall-a:eth4", "ldap-a:eth1"]
+    - endpoints: ["firewall-a:eth5", "monitor-a:eth1"]
+
+    # WAN link: router-a1 ↔ isp-a
+    - endpoints: ["router-a1:eth2", "isp-a:eth1"]
+
+    #########################################################################
+    # Site B Internal Links
+    #########################################################################
+
+    # OSPF link: router-b1 ↔ router-b2
+    - endpoints: ["router-b1:eth1", "router-b2:eth1"]
+
+    # LAN uplink: router-b2 ↔ firewall-b
+    - endpoints: ["router-b2:eth2", "firewall-b:eth1"]
+
+    # Server segments (firewall-b as hub)
+    - endpoints: ["firewall-b:eth2", "web-b:eth1"]
+    - endpoints: ["firewall-b:eth3", "server-b:eth1"]
+
+    # WAN link: router-b1 ↔ isp-b
+    - endpoints: ["router-b1:eth2", "isp-b:eth1"]
+
+    #########################################################################
+    # Internet Backbone Links
+    #########################################################################
+
+    # ISP upstream links
+    - endpoints: ["isp-a:eth2", "internet-core:eth1"]
+    - endpoints: ["isp-b:eth2", "internet-core:eth2"]
+
+    # BGP peering links (backup paths)
+    - endpoints: ["router-a1:eth3", "internet-core:eth3"]
+    - endpoints: ["router-b1:eth3", "internet-core:eth4"]
+
+    #########################################################################
+    # Management Links
+    #########################################################################
+
+    # Netbox out-of-band management
+    - endpoints: ["router-a2:eth3", "netbox:eth1"]
+
+    # Grafana metrics collection link (optional)
+    - endpoints: ["router-a2:eth4", "monitor-a:eth2"]

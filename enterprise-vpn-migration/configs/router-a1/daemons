@@ -1,0 +1,35 @@
+# FRR Daemons Configuration - Router-A1
+#
+# This file tells the FRR start script which daemons to start.
+#
+# Entries are in the format: <daemon>=(yes|no|priority)
+#   0 = disabled
+#   1 = highest priority
+#   2-10 = lower priorities
+#
+# Read /usr/share/doc/frr/README.Debian for details.
+
+zebra=yes
+bgpd=yes
+ospfd=yes
+ospf6d=no
+ripd=no
+ripngd=no
+isisd=no
+pimd=no
+ldpd=no
+nhrpd=no
+eigrpd=no
+babeld=no
+sharpd=no
+pbrd=no
+bfdd=no
+fabricd=no
+vrrpd=no
+pathd=no
+
+# Enable integrated config file
+vtysh_enable=yes
+zebra_options="  -A 127.0.0.1 -s 90000000"
+bgpd_options="   -A 127.0.0.1"
+ospfd_options="  -A 127.0.0.1"
