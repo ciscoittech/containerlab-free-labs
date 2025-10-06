@@ -28,15 +28,15 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 
 | Router | Site | SSH Port | Command |
 |--------|------|----------|---------|
-| **router-a1** | Chicago Edge | 2231 | `ssh -p 2231 admin@localhost` |
-| **router-a2** | Chicago Core | 2232 | `ssh -p 2232 admin@localhost` |
-| **router-b1** | Austin Edge | 2233 | `ssh -p 2233 admin@localhost` |
-| **router-b2** | Austin Core | 2234 | `ssh -p 2234 admin@localhost` |
-| **internet-core** | ISP Backbone | 2235 | `ssh -p 2235 admin@localhost` |
+| **router-a1** | Chicago Edge | 2231 | `ssh -p 2231 cisco@localhost` |
+| **router-a2** | Chicago Core | 2232 | `ssh -p 2232 cisco@localhost` |
+| **router-b1** | Austin Edge | 2233 | `ssh -p 2233 cisco@localhost` |
+| **router-b2** | Austin Core | 2234 | `ssh -p 2234 cisco@localhost` |
+| **internet-core** | ISP Backbone | 2235 | `ssh -p 2235 cisco@localhost` |
 
 **Credentials**:
-- Username: `admin`
-- Password: `NokiaSrl1!`
+- Username: `cisco`
+- Password: `cisco`
 
 ---
 
@@ -44,8 +44,8 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 
 ### SSH to router-a1 (Chicago Edge)
 ```bash
-ssh -p 2231 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2231 cisco@localhost
+# Password: cisco
 
 admin@router-a1$ vtysh
 router-a1# show ip ospf neighbor
@@ -58,7 +58,7 @@ router-a1(config)# router ospf
 
 ### SSH to router-b1 (Austin Edge - VPN Endpoint)
 ```bash
-ssh -p 2233 admin@localhost
+ssh -p 2233 cisco@localhost
 
 admin@router-b1$ vtysh
 router-b1# show ip bgp neighbors
@@ -68,7 +68,7 @@ router-b1# ip addr show gre0
 
 ### SSH to internet-core (ISP Backbone)
 ```bash
-ssh -p 2235 admin@localhost
+ssh -p 2235 cisco@localhost
 
 admin@internet-core$ vtysh
 internet-core# show ip bgp summary
@@ -123,8 +123,8 @@ cd /Users/bhunt/development/claude/containerlab-free-labs/enterprise-vpn-migrati
 sleep 30
 
 # Test SSH to router-a1
-ssh -p 2231 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2231 cisco@localhost
+# Password: cisco
 
 # Check OSPF
 vtysh -c "show ip ospf neighbor"

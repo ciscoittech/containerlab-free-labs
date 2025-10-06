@@ -78,18 +78,18 @@ Each router has SSH enabled on a unique host port:
 
 | Router | SSH Port | SSH Command |
 |--------|----------|-------------|
-| **r1** | 2221 | `ssh -p 2221 admin@localhost` |
-| **r2** | 2222 | `ssh -p 2222 admin@localhost` |
-| **r3** | 2223 | `ssh -p 2223 admin@localhost` |
+| **r1** | 2221 | `ssh -p 2221 cisco@localhost` |
+| **r2** | 2222 | `ssh -p 2222 cisco@localhost` |
+| **r3** | 2223 | `ssh -p 2223 cisco@localhost` |
 
 **Credentials**:
-- Username: `admin`
-- Password: `NokiaSrl1!`
+- Username: `cisco`
+- Password: `cisco`
 
 **Example - SSH to r1**:
 ```bash
-ssh -p 2221 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2221 cisco@localhost
+# Password: cisco
 
 admin@r1$ vtysh
 r1# show ip ospf neighbor

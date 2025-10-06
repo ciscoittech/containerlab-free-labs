@@ -26,13 +26,13 @@ RUN apk add --no-cache \
 # Create SSH directory
 RUN mkdir -p /var/run/sshd
 
-# Create admin user with password and bash shell
-RUN adduser -D -s /bin/bash admin && \
-    echo 'admin:NokiaSrl1!' | chpasswd && \
-    addgroup admin frrvty
+# Create cisco user with password and bash shell
+RUN adduser -D -s /bin/bash cisco && \
+    echo 'cisco:cisco' | chpasswd && \
+    addgroup cisco frrvty
 
-# Allow admin user to access vtysh without password
-RUN echo 'admin ALL=(ALL) NOPASSWD: /usr/bin/vtysh' >> /etc/sudoers
+# Allow cisco user to access vtysh without password
+RUN echo 'cisco ALL=(ALL) NOPASSWD: /usr/bin/vtysh' >> /etc/sudoers
 
 # Configure SSH
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config && \
@@ -40,10 +40,10 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/s
     sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
     ssh-keygen -A
 
-# Create vtysh wrapper for admin user
-RUN echo '#!/bin/bash' > /usr/local/bin/vtysh-admin && \
-    echo 'sudo /usr/bin/vtysh "$@"' >> /usr/local/bin/vtysh-admin && \
-    chmod +x /usr/local/bin/vtysh-admin
+# Create vtysh wrapper for cisco user
+RUN echo '#!/bin/bash' > /usr/local/bin/vtysh-cisco && \
+    echo 'sudo /usr/bin/vtysh "$@"' >> /usr/local/bin/vtysh-cisco && \
+    chmod +x /usr/local/bin/vtysh-cisco
 
 # Ensure FRR config directory exists and has proper permissions
 RUN mkdir -p /etc/frr && \
@@ -53,12 +53,12 @@ RUN mkdir -p /etc/frr && \
     chmod 640 /etc/frr/frr.conf && \
     chmod 640 /etc/frr/daemons
 
-# Add vtysh to admin's PATH and auto-start vtysh on SSH login
+# Add vtysh to cisco's PATH and auto-start vtysh on SSH login
 # Use .bash_profile for login shells (SSH) instead of .bashrc
-RUN echo 'alias vtysh="sudo /usr/bin/vtysh"' >> /home/admin/.bash_profile && \
-    echo 'export PATH=$PATH:/usr/local/bin' >> /home/admin/.bash_profile && \
-    echo '# Auto-start vtysh on SSH login (like real routers)' >> /home/admin/.bash_profile && \
-    echo 'exec sudo /usr/bin/vtysh' >> /home/admin/.bash_profile
+RUN echo 'alias vtysh="sudo /usr/bin/vtysh"' >> /home/cisco/.bash_profile && \
+    echo 'export PATH=$PATH:/usr/local/bin' >> /home/cisco/.bash_profile && \
+    echo '# Auto-start vtysh on SSH login (like real routers)' >> /home/cisco/.bash_profile && \
+    echo 'exec sudo /usr/bin/vtysh' >> /home/cisco/.bash_profile
 
 # Expose SSH port
 EXPOSE 22

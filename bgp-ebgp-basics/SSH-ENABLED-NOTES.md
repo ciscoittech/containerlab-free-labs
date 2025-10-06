@@ -29,14 +29,14 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 
 | Router | AS  | SSH Port | Command |
 |--------|-----|----------|---------|
-| **r1** | 100 | 2211 | `ssh -p 2211 admin@localhost` |
-| **r2** | 200 | 2212 | `ssh -p 2212 admin@localhost` |
-| **r3** | 300 | 2213 | `ssh -p 2213 admin@localhost` |
-| **r4** | 100 | 2214 | `ssh -p 2214 admin@localhost` |
+| **r1** | 100 | 2211 | `ssh -p 2211 cisco@localhost` |
+| **r2** | 200 | 2212 | `ssh -p 2212 cisco@localhost` |
+| **r3** | 300 | 2213 | `ssh -p 2213 cisco@localhost` |
+| **r4** | 100 | 2214 | `ssh -p 2214 cisco@localhost` |
 
 **Credentials**:
-- Username: `admin`
-- Password: `NokiaSrl1!`
+- Username: `cisco`
+- Password: `cisco`
 
 ---
 
@@ -44,8 +44,8 @@ This lab has been upgraded from standard FRR containers to custom FRR SSH-enable
 
 ### SSH to r1 (AS 100) - Auto-Login to Router CLI
 ```bash
-ssh -p 2211 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2211 cisco@localhost
+# Password: cisco
 
 # You land DIRECTLY in router CLI - no bash shell!
 r1# show ip bgp summary
@@ -59,8 +59,8 @@ r1(config)# router bgp 100
 
 ### SSH to r2 (AS 200 - Transit)
 ```bash
-ssh -p 2212 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2212 cisco@localhost
+# Password: cisco
 
 # Direct router CLI access
 r2# show ip bgp neighbors
@@ -113,8 +113,8 @@ cd /Users/bhunt/development/claude/containerlab-free-labs/bgp-ebgp-basics
 sleep 5
 
 # Test SSH to r1
-ssh -p 2211 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2211 cisco@localhost
+# Password: cisco
 
 # Check BGP
 vtysh -c "show ip bgp summary"

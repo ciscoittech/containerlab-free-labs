@@ -40,8 +40,8 @@ sleep 10
 
 **SSH to router r1:**
 ```bash
-ssh -p 2211 admin@localhost
-# Password: NokiaSrl1!
+ssh -p 2211 cisco@localhost
+# Password: cisco
 ```
 
 **Expected:** You land DIRECTLY at the router CLI:
@@ -82,8 +82,8 @@ After building `frr-ssh:latest` once, you can deploy any lab:
 ## SSH Access
 
 All FRR routers have SSH enabled with **auto-login to CLI**:
-- Username: `admin`
-- Password: `NokiaSrl1!`
+- Username: `cisco`
+- Password: `cisco`
 - Behavior: Lands directly in `router#` prompt (like real Cisco/Juniper routers)
 
 ---
@@ -164,10 +164,10 @@ docker rmi frr-ssh:latest
 cd bgp-ebgp-basics && clab deploy -t topology.clab.yml
 
 # SSH to routers
-ssh -p 2211 admin@localhost  # r1
-ssh -p 2212 admin@localhost  # r2
-ssh -p 2213 admin@localhost  # r3
-ssh -p 2214 admin@localhost  # r4
+ssh -p 2211 cisco@localhost  # r1
+ssh -p 2212 cisco@localhost  # r2
+ssh -p 2213 cisco@localhost  # r3
+ssh -p 2214 cisco@localhost  # r4
 
 # Destroy lab
 clab destroy -t topology.clab.yml --cleanup
