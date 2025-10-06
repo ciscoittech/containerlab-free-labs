@@ -97,6 +97,82 @@ Wait ~30 seconds for all services to initialize (FRR daemons, nginx, dnsmasq, Gr
 
 If any tests fail, troubleshoot before proceeding with the migration exercise.
 
+## Accessing Lab Devices
+
+**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+
+### Access Router CLI (vtysh)
+
+**Interactive mode** (Cisco-like CLI):
+```bash
+docker exec -it clab-enterprise-vpn-migration-router-a1 vtysh
+```
+
+**Run single command**:
+```bash
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip bgp summary"
+```
+
+**Access bash shell** (for debugging):
+```bash
+docker exec -it clab-enterprise-vpn-migration-router-a1 bash
+```
+
+### Access Other Services
+
+**Alpine Linux containers** (web, dns, ldap servers):
+```bash
+# Web server
+docker exec -it clab-enterprise-vpn-migration-web-a sh
+
+# DNS server
+docker exec -it clab-enterprise-vpn-migration-dns-a sh
+
+# LDAP server
+docker exec -it clab-enterprise-vpn-migration-ldap-a sh
+```
+
+**VyOS Firewall**:
+```bash
+# Access VyOS configuration mode
+docker exec -it clab-enterprise-vpn-migration-firewall-a bash
+```
+
+### Common Commands by Device Type
+
+**FRR Routers** (router-a1, router-a2, router-b1, router-b2, internet-core):
+
+| Task | Command |
+|------|---------|
+| Check BGP status | `docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip bgp summary"` |
+| Check OSPF neighbors | `docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip ospf neighbor"` |
+| View GRE tunnel | `docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel show` |
+| Check routing table | `docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip route"` |
+| View configuration | `docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show run"` |
+
+**Web Servers** (web-a, web-b):
+
+| Task | Command |
+|------|---------|
+| Check nginx status | `docker exec clab-enterprise-vpn-migration-web-a ps aux \| grep nginx` |
+| Test web service | `docker exec clab-enterprise-vpn-migration-web-a curl -I localhost` |
+| View logs | `docker exec clab-enterprise-vpn-migration-web-a cat /var/log/nginx/access.log` |
+
+**DNS Server** (dns-a):
+
+| Task | Command |
+|------|---------|
+| Test DNS query | `docker exec clab-enterprise-vpn-migration-dns-a nslookup web-a.site-a.local localhost` |
+| View dnsmasq config | `docker exec clab-enterprise-vpn-migration-dns-a cat /etc/dnsmasq.conf` |
+| Check process | `docker exec clab-enterprise-vpn-migration-dns-a ps aux \| grep dnsmasq` |
+
+**Why no SSH?**
+- ✅ Faster container startup (no SSH daemon)
+- ✅ Smaller container images (50MB vs 200MB+)
+- ✅ More secure (no SSH attack surface)
+- ✅ Standard practice for containerized labs
+- ✅ Works in GitHub Codespaces
+
 ## The Challenge
 
 ### Current State

@@ -1,0 +1,31 @@
+{
+  "name": "Zero Trust Fundamentals Lab",
+  "image": "ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0",
+  "runArgs": [
+    "--privileged",
+    "--network=host"
+  ],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.makefile-tools",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "containerlab.containerlab"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black"
+      }
+    }
+  },
+  "postCreateCommand": "containerlab version && docker pull ghcr.io/sever-sever/vyos-container:latest && docker pull alpine:latest && docker pull mongo:7.0 && pip install fastapi uvicorn httpx motor pymongo pyjwt",
+  "remoteUser": "vscode"
+}

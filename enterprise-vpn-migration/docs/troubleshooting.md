@@ -18,6 +18,102 @@ This guide provides detailed troubleshooting procedures for common issues encoun
 
 ## Container and Infrastructure Issues
 
+### Issue 1.0: Cannot SSH to Lab Devices
+
+**Symptoms**:
+- `ssh admin@<container-ip>` connection refused or timeout
+- Cannot use SSH client to access router CLI or other devices
+- Error: "Connection refused" or "No route to host"
+
+**Cause**:
+FRR containers and Alpine Linux containers do NOT include SSH server by default. This is **intentional** - containers are designed for single-process execution and SSH adds unnecessary complexity and security risks.
+
+**This is NOT a bug - it's container best practice!**
+
+**Solution** - Use `docker exec` instead:
+
+**For FRR Routers** (router-a1, router-a2, router-b1, router-b2, internet-core):
+```bash
+# Access router CLI (interactive vtysh)
+docker exec -it clab-enterprise-vpn-migration-router-a1 vtysh
+
+# Run single command
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip bgp summary"
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip ospf neighbor"
+
+# Access bash shell (for debugging)
+docker exec -it clab-enterprise-vpn-migration-router-a1 bash
+
+# Check GRE tunnel
+docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel show
+docker exec clab-enterprise-vpn-migration-router-a1 ping -c 3 172.16.0.2
+```
+
+**For Alpine Linux Services** (web-a, web-b, dns-a, ldap-a, server-b, isp-a, isp-b):
+```bash
+# Access Alpine containers (use 'sh' not 'bash')
+docker exec -it clab-enterprise-vpn-migration-web-a sh
+docker exec -it clab-enterprise-vpn-migration-dns-a sh
+
+# Run commands directly
+docker exec clab-enterprise-vpn-migration-web-a curl http://10.2.20.10
+docker exec clab-enterprise-vpn-migration-dns-a nslookup web-a.site-a.local localhost
+```
+
+**For VyOS Firewalls** (firewall-a, firewall-b):
+```bash
+# Access VyOS CLI
+docker exec -it clab-enterprise-vpn-migration-firewall-a bash
+
+# Or run commands directly
+docker exec clab-enterprise-vpn-migration-firewall-a ip addr show
+```
+
+**For Monitoring/IPAM** (monitor-a, netbox):
+```bash
+# Access Grafana container
+docker exec -it clab-enterprise-vpn-migration-monitor-a sh
+
+# Access Netbox container
+docker exec -it clab-enterprise-vpn-migration-netbox sh
+```
+
+**Why This Is Better Than SSH**:
+- ✅ Faster container startup (no SSH daemon to initialize)
+- ✅ Smaller container images (50MB vs 200MB+ with SSH)
+- ✅ More secure (no SSH attack surface or credential management)
+- ✅ Standard practice for containerized network labs
+- ✅ Works in GitHub Codespaces (no root access required)
+- ✅ No port conflicts or firewall issues
+
+**Alternative (NOT Recommended for Labs)**:
+If you absolutely need SSH for a specific use case, you can add openssh-server manually:
+
+```yaml
+# topology.clab.yml (DON'T DO THIS IN PRODUCTION LABS)
+nodes:
+  router-a1:
+    exec:
+      - apt-get update && apt-get install -y openssh-server
+      - echo 'root:cisco' | chpasswd
+      - service ssh start
+```
+
+**Trade-offs**:
+- ❌ Adds 30-60 seconds to container startup (16 containers = 8-16 minute delay)
+- ❌ Increases image size by 150MB per router (2.4GB total overhead)
+- ❌ Requires managing SSH credentials for 16 devices
+- ❌ Not portable to GitHub Codespaces
+- ❌ Breaks container best practices
+- ❌ Creates security risks (default credentials, SSH vulnerabilities)
+
+**For More Information**:
+- See [Accessing Lab Devices](../README.md#accessing-lab-devices) section in main README
+- All validation scripts use `docker exec` - follow those examples
+- This applies to ALL containerized network labs (industry standard)
+
+---
+
 ### Issue 1.1: Containers Won't Start During Deployment
 
 **Symptoms**:

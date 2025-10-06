@@ -1,5 +1,7 @@
 ## BGP eBGP Basics Lab
 
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=bgp-ebgp-basics/.devcontainer/devcontainer.json)
+
 **Difficulty**: ⭐⭐ Beginner
 **Estimated Time**: 60 minutes
 **Prerequisites**: Basic TCP/IP knowledge, OSPF Basics lab recommended
@@ -70,6 +72,43 @@ docker exec -it clab-bgp-ebgp-basics-r1 vtysh
 # Cleanup
 sudo containerlab destroy -t topology.clab.yml
 ```
+
+## Accessing Lab Devices
+
+**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+
+### Access Router CLI (vtysh)
+
+**Interactive mode** (Cisco-like CLI):
+```bash
+docker exec -it clab-bgp-ebgp-basics-r1 vtysh
+```
+
+**Run single command**:
+```bash
+docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary"
+```
+
+**Access bash shell** (for debugging):
+```bash
+docker exec -it clab-bgp-ebgp-basics-r1 bash
+```
+
+### Common Commands
+
+| Task | Command |
+|------|---------|
+| Check BGP status | `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary"` |
+| View BGP routes | `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp"` |
+| Check neighbors | `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp neighbors"` |
+| View routing table | `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip route"` |
+| Show configuration | `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show run"` |
+
+**Why no SSH?**
+- ✅ Faster container startup (no SSH daemon)
+- ✅ Smaller container images (50MB vs 200MB+)
+- ✅ More secure (no SSH attack surface)
+- ✅ Standard practice for containerized labs
 
 ## Lab Exercises
 

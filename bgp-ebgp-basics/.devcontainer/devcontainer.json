@@ -1,6 +1,6 @@
 {
   "name": "BGP eBGP Basics Lab",
-  "image": "ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.66.0",
+  "image": "ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0",
   "runArgs": [
     "--privileged",
     "--network=host"

@@ -1,5 +1,7 @@
 # Linux Network Namespaces Lab
 
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=linux-network-namespaces/.devcontainer/devcontainer.json)
+
 **Difficulty**: ⭐ Beginner
 **Estimated Time**: 30 minutes
 **Prerequisites**: Basic Linux command line knowledge

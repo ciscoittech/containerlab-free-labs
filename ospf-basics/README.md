@@ -1,5 +1,7 @@
 # OSPF Basics Lab
 
+[![Open in GitHub Codespaces](../.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?devcontainer_path=ospf-basics/.devcontainer/devcontainer.json)
+
 **Difficulty**: ⭐⭐ Beginner
 **Estimated Time**: 45 minutes
 **Prerequisites**: Basic networking knowledge
@@ -65,6 +67,43 @@ docker exec -it clab-ospf-basics-r1 vtysh
 # Cleanup
 sudo containerlab destroy -t topology.clab.yml
 ```
+
+## Accessing Lab Devices
+
+**Important Note**: FRR containers do NOT include SSH server. This is intentional for security and container best practices.
+
+### Access Router CLI (vtysh)
+
+**Interactive mode** (Cisco-like CLI):
+```bash
+docker exec -it clab-ospf-basics-r1 vtysh
+```
+
+**Run single command**:
+```bash
+docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf neighbor"
+```
+
+**Access bash shell** (for debugging):
+```bash
+docker exec -it clab-ospf-basics-r1 bash
+```
+
+### Common Commands
+
+| Task | Command |
+|------|---------|
+| Check OSPF neighbors | `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf neighbor"` |
+| View OSPF routes | `docker exec clab-ospf-basics-r1 vtysh -c "show ip route ospf"` |
+| Check OSPF database | `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf database"` |
+| View routing table | `docker exec clab-ospf-basics-r1 vtysh -c "show ip route"` |
+| Show configuration | `docker exec clab-ospf-basics-r1 vtysh -c "show run"` |
+
+**Why no SSH?**
+- ✅ Faster container startup (no SSH daemon)
+- ✅ Smaller container images (50MB vs 200MB+)
+- ✅ More secure (no SSH attack surface)
+- ✅ Standard practice for containerized labs
 
 ## Lab Exercises
 

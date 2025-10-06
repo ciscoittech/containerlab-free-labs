@@ -135,7 +135,7 @@
 ### Cannot Test on Mac Host Directly
 - Containerlab requires Linux kernel
 - **Solution**: Use VS Code devcontainer (Linux environment)
-- Devcontainer uses: `ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.66.0`
+- Devcontainer uses: `ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.68.0`
 
 ### Docker-in-Docker (DooD)
 - Devcontainer uses Docker-outside-of-Docker

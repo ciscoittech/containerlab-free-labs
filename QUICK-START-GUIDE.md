@@ -342,7 +342,7 @@ Every lab follows the same structure:
 
 ### 3. Contribute to the Project
 - Found a bug? Open an [issue](https://github.com/ciscoittech/containerlab-free-labs/issues)
-- Have an idea? Start a [discussion](https://github.com/ciscoittech/containerlab-free-labs/discussions)
+- Have an idea? Join the [discussion](https://github.com/ciscoittech/containerlab-free-labs/discussions)
 - Want to add a lab? See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ### 4. Explore Advanced Labs (Coming Soon)

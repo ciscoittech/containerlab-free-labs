@@ -1,0 +1,19 @@
+{
+  "project_name": "Containerlab Free Labs",
+  "description": "User journey testing framework for containerlab documentation",
+  "version": "1.0.0",
+  "auto_load_agents": false,
+  "commands": {
+    "test-vscode-journey": {
+      "path": ".claude/commands/test-vscode-journey.md",
+      "description": "Test VS Code + Docker Desktop user journey",
+      "agents_used": [
+        "environment-checker",
+        "journey-parser",
+        "devcontainer-executor",
+        "results-analyzer",
+        "doc-updater"
+      ]
+    }
+  }
+}
