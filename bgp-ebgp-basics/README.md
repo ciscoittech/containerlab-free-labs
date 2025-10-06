@@ -95,18 +95,18 @@ Each router has SSH enabled on a unique host port:
 
 | Router | AS  | SSH Port | SSH Command |
 |--------|-----|----------|-------------|
-| **r1** | 100 | 2211 | `ssh -p 2211 cisco@localhost` |
-| **r2** | 200 | 2212 | `ssh -p 2212 cisco@localhost` |
-| **r3** | 300 | 2213 | `ssh -p 2213 cisco@localhost` |
-| **r4** | 100 | 2214 | `ssh -p 2214 cisco@localhost` |
+| **r1** | 100 | 2211 | `ssh -p 2211 admin@localhost` |
+| **r2** | 200 | 2212 | `ssh -p 2212 admin@localhost` |
+| **r3** | 300 | 2213 | `ssh -p 2213 admin@localhost` |
+| **r4** | 100 | 2214 | `ssh -p 2214 admin@localhost` |
 
 **Credentials**:
-- Username: `cisco`
+- Username: `admin`
 - Password: `cisco`
 
 **Example - SSH to r1** (lands directly in router CLI):
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 # Password: cisco
 
 # You land DIRECTLY in router CLI - no need to type 'vtysh'!

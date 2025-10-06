@@ -10,7 +10,7 @@
 ### Problem
 SSH was taking users to bash shell instead of router CLI:
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 admin@r1$  # ❌ Wrong - this is bash shell
 ```
 
@@ -22,7 +22,7 @@ Updated `frr-ssh:latest` image to:
 ### Result
 SSH now lands directly in router CLI like real Cisco/Juniper routers:
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 # Password: cisco
 
 r1#  # ✅ Correct - immediately in router CLI!
@@ -60,7 +60,7 @@ sleep 10  # Give FRR daemons time to initialize
 
 ### Step 4: Test SSH Auto-Login
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 # Password: cisco
 
 # You should IMMEDIATELY see:
@@ -78,10 +78,10 @@ r1# show version
 
 | Router | AS  | SSH Command |
 |--------|-----|-------------|
-| r1 | 100 | `ssh -p 2211 cisco@localhost` |
-| r2 | 200 | `ssh -p 2212 cisco@localhost` |
-| r3 | 300 | `ssh -p 2213 cisco@localhost` |
-| r4 | 100 | `ssh -p 2214 cisco@localhost` |
+| r1 | 100 | `ssh -p 2211 admin@localhost` |
+| r2 | 200 | `ssh -p 2212 admin@localhost` |
+| r3 | 300 | `ssh -p 2213 admin@localhost` |
+| r4 | 100 | `ssh -p 2214 admin@localhost` |
 
 Password: `cisco`
 

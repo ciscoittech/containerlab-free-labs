@@ -107,19 +107,19 @@ Each FRR router has SSH enabled on a unique host port:
 
 | Router | Site | SSH Port | SSH Command |
 |--------|------|----------|-------------|
-| **router-a1** | Chicago | 2231 | `ssh -p 2231 cisco@localhost` |
-| **router-a2** | Chicago | 2232 | `ssh -p 2232 cisco@localhost` |
-| **router-b1** | Austin | 2233 | `ssh -p 2233 cisco@localhost` |
-| **router-b2** | Austin | 2234 | `ssh -p 2234 cisco@localhost` |
-| **internet-core** | ISP Backbone | 2235 | `ssh -p 2235 cisco@localhost` |
+| **router-a1** | Chicago | 2231 | `ssh -p 2231 admin@localhost` |
+| **router-a2** | Chicago | 2232 | `ssh -p 2232 admin@localhost` |
+| **router-b1** | Austin | 2233 | `ssh -p 2233 admin@localhost` |
+| **router-b2** | Austin | 2234 | `ssh -p 2234 admin@localhost` |
+| **internet-core** | ISP Backbone | 2235 | `ssh -p 2235 admin@localhost` |
 
 **Credentials**:
-- Username: `cisco`
+- Username: `admin`
 - Password: `cisco`
 
 **Example - SSH to router-a1**:
 ```bash
-ssh -p 2231 cisco@localhost
+ssh -p 2231 admin@localhost
 # Password: cisco
 
 admin@router-a1$ vtysh

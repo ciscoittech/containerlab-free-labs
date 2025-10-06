@@ -35,7 +35,7 @@ clab deploy -t topology.clab.yml
 sleep 10
 
 # 7. Test SSH - should land at r1# now!
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 # Password: cisco
 ```
 
@@ -45,13 +45,13 @@ ssh -p 2211 cisco@localhost
 
 **Before (broken):**
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 r1:~$  # ❌ Wrong - bash shell
 ```
 
 **After (fixed):**
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 r1#  # ✅ Correct - router CLI!
 r1# show ip bgp summary
 r1# show ip route
@@ -78,7 +78,7 @@ r1# show ip route
 After rebuilding:
 
 ```bash
-ssh -p 2211 cisco@localhost
+ssh -p 2211 admin@localhost
 # Password: cisco
 
 # You should IMMEDIATELY see:
