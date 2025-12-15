@@ -13,8 +13,9 @@ topology:
       kind: linux
       image: alpine:latest
       exec:
-        - ip addr add 10.0.1.20/24 dev eth1
-        - ip route add 10.0.2.0/24 via 10.0.1.1
+        - ip addr add 10.0.3.20/24 dev eth1
+        - ip route add 10.0.1.0/24 via 10.0.3.1
+        - ip route add 10.0.2.0/24 via 10.0.3.1
 
     router:
       kind: linux
@@ -22,6 +23,7 @@ topology:
       exec:
         - ip addr add 10.0.1.1/24 dev eth1
         - ip addr add 10.0.2.1/24 dev eth2
+        - ip addr add 10.0.3.1/24 dev eth3
         - sysctl -w net.ipv4.ip_forward=1
 
     host3:
@@ -30,13 +32,9 @@ topology:
       exec:
         - ip addr add 10.0.2.10/24 dev eth1
         - ip route add 10.0.1.0/24 via 10.0.2.1
-
-    # Bridge for LAN segment (connects host1, host2, router)
-    lan-switch:
-      kind: bridge
+        - ip route add 10.0.3.0/24 via 10.0.2.1
 
   links:
-    - endpoints: ["host1:eth1", "lan-switch:eth1"]
-    - endpoints: ["host2:eth1", "lan-switch:eth2"]
-    - endpoints: ["router:eth1", "lan-switch:eth3"]
+    - endpoints: ["host1:eth1", "router:eth1"]
+    - endpoints: ["host2:eth1", "router:eth3"]
     - endpoints: ["router:eth2", "host3:eth1"]

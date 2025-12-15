@@ -21,8 +21,8 @@ echo ""
 
 # Test 2: Check if host2 can ping router
 echo "Test 2: host2 -> router connectivity..."
-if docker exec clab-netns-basics-host2 ping -c 2 10.0.1.1 >/dev/null 2>&1; then
-    echo "  ✓ PASSED - host2 can ping router (10.0.1.1)"
+if docker exec clab-netns-basics-host2 ping -c 2 10.0.3.1 >/dev/null 2>&1; then
+    echo "  ✓ PASSED - host2 can ping router (10.0.3.1)"
     ((PASSED++))
 else
     echo "  ✗ FAILED - host2 cannot ping router"
@@ -30,10 +30,10 @@ else
 fi
 echo ""
 
-# Test 3: Check if host1 and host2 can ping each other
-echo "Test 3: host1 <-> host2 connectivity (same subnet)..."
-if docker exec clab-netns-basics-host1 ping -c 2 10.0.1.20 >/dev/null 2>&1; then
-    echo "  ✓ PASSED - host1 can ping host2 (10.0.1.20)"
+# Test 3: Check if host1 and host2 can ping each other (via router)
+echo "Test 3: host1 <-> host2 connectivity (via router)..."
+if docker exec clab-netns-basics-host1 ping -c 2 10.0.3.20 >/dev/null 2>&1; then
+    echo "  ✓ PASSED - host1 can ping host2 (10.0.3.20) via router"
     ((PASSED++))
 else
     echo "  ✗ FAILED - host1 cannot ping host2"
