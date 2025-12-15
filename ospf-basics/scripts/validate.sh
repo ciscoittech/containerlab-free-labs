@@ -44,24 +44,24 @@ else
 fi
 echo ""
 
-# Test 4: Check if r1 has routes to 192.168.100.0/24
-echo "Test 4: Checking if r1 learned route to 192.168.100.0/24..."
-if docker exec clab-ospf-basics-r1 vtysh -c "show ip route" 2>/dev/null | grep -q "192.168.100.0/24"; then
-    echo "  ✓ PASSED - r1 has route to 192.168.100.0/24"
+# Test 4: Check if r1 has routes to 192.168.100.1/32 (r3 loopback)
+echo "Test 4: Checking if r1 learned route to 192.168.100.1/32..."
+if docker exec clab-ospf-basics-r1 vtysh -c "show ip route" 2>/dev/null | grep -q "192.168.100.1/32"; then
+    echo "  ✓ PASSED - r1 has route to 192.168.100.1/32"
     ((PASSED++))
 else
-    echo "  ✗ FAILED - r1 missing route to 192.168.100.0/24"
+    echo "  ✗ FAILED - r1 missing route to 192.168.100.1/32"
     ((FAILED++))
 fi
 echo ""
 
-# Test 5: Check if r2 has routes to 192.168.100.0/24
-echo "Test 5: Checking if r2 learned route to 192.168.100.0/24..."
-if docker exec clab-ospf-basics-r2 vtysh -c "show ip route" 2>/dev/null | grep -q "192.168.100.0/24"; then
-    echo "  ✓ PASSED - r2 has route to 192.168.100.0/24"
+# Test 5: Check if r2 has routes to 192.168.100.1/32 (r3 loopback)
+echo "Test 5: Checking if r2 learned route to 192.168.100.1/32..."
+if docker exec clab-ospf-basics-r2 vtysh -c "show ip route" 2>/dev/null | grep -q "192.168.100.1/32"; then
+    echo "  ✓ PASSED - r2 has route to 192.168.100.1/32"
     ((PASSED++))
 else
-    echo "  ✗ FAILED - r2 missing route to 192.168.100.0/24"
+    echo "  ✗ FAILED - r2 missing route to 192.168.100.1/32"
     ((FAILED++))
 fi
 echo ""

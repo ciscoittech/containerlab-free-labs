@@ -19,9 +19,6 @@ topology:
         - configs/r1/frr.conf:/etc/frr/frr.conf
       ports:
         - 2221:22  # SSH access
-      exec:
-        - ip addr add 10.0.1.1/24 dev eth1
-        - ip addr add 10.0.2.1/24 dev eth2
       labels:
         lab-name: "OSPF Basics"
         router-name: "R1"
@@ -34,9 +31,6 @@ topology:
         - configs/r2/frr.conf:/etc/frr/frr.conf
       ports:
         - 2222:22  # SSH access
-      exec:
-        - ip addr add 10.0.1.2/24 dev eth1
-        - ip addr add 10.0.3.2/24 dev eth2
       labels:
         lab-name: "OSPF Basics"
         router-name: "R2"
@@ -49,10 +43,6 @@ topology:
         - configs/r3/frr.conf:/etc/frr/frr.conf
       ports:
         - 2223:22  # SSH access
-      exec:
-        - ip addr add 10.0.2.3/24 dev eth1
-        - ip addr add 10.0.3.3/24 dev eth2
-        - ip addr add 192.168.100.1/32 dev lo
       labels:
         lab-name: "OSPF Basics"
         router-name: "R3"
