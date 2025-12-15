@@ -140,3 +140,133 @@ jobs:
         run: |
           cd linux-network-namespaces
           sudo containerlab destroy -t topology.clab.yml || true
+
+  validate-vyos:
+    name: VyOS Firewall Basics Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Deploy VyOS Firewall lab
+        run: |
+          cd vyos-firewall-basics
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for VyOS initialization
+        run: sleep 60
+
+      - name: Run validation tests
+        run: |
+          cd vyos-firewall-basics
+          chmod +x scripts/validate.sh
+          sudo bash scripts/validate.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd vyos-firewall-basics
+          sudo containerlab destroy -t topology.clab.yml || true
+
+  validate-enterprise-vpn:
+    name: Enterprise VPN Migration Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Build frr-ssh image
+        run: |
+          bash ./build-frr-ssh.sh
+
+      - name: Deploy Enterprise VPN lab
+        run: |
+          cd enterprise-vpn-migration
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for convergence
+        run: sleep 90
+
+      - name: Run validation tests (quick mode)
+        run: |
+          cd enterprise-vpn-migration
+          chmod +x scripts/validate.sh
+          sudo bash scripts/validate.sh --quick
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd enterprise-vpn-migration
+          sudo containerlab destroy -t topology.clab.yml --cleanup || true
+
+  validate-zero-trust:
+    name: Zero Trust Fundamentals Lab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy Zero Trust lab
+        run: |
+          cd zero-trust-fundamentals
+          docker-compose up -d --build
+
+      - name: Wait for services
+        run: sleep 30
+
+      - name: Run validation tests
+        run: |
+          cd zero-trust-fundamentals
+          chmod +x scripts/validate.sh
+          bash scripts/validate.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd zero-trust-fundamentals
+          docker-compose down -v || true
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [validate-ospf, validate-bgp, validate-netns, validate-vyos, validate-enterprise-vpn, validate-zero-trust]
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          echo "========================================="
+          echo "Lab Validation Summary"
+          echo "========================================="
+          echo ""
+          echo "OSPF Basics:           ${{ needs.validate-ospf.result }}"
+          echo "BGP eBGP Basics:       ${{ needs.validate-bgp.result }}"
+          echo "Linux Namespaces:      ${{ needs.validate-netns.result }}"
+          echo "VyOS Firewall:         ${{ needs.validate-vyos.result }}"
+          echo "Enterprise VPN:        ${{ needs.validate-enterprise-vpn.result }}"
+          echo "Zero Trust:            ${{ needs.validate-zero-trust.result }}"
+          echo ""
+
+          # Fail if any job failed
+          if [ "${{ needs.validate-ospf.result }}" != "success" ] || \
+             [ "${{ needs.validate-bgp.result }}" != "success" ] || \
+             [ "${{ needs.validate-netns.result }}" != "success" ] || \
+             [ "${{ needs.validate-vyos.result }}" != "success" ] || \
+             [ "${{ needs.validate-enterprise-vpn.result }}" != "success" ] || \
+             [ "${{ needs.validate-zero-trust.result }}" != "success" ]; then
+            echo "Some labs failed validation!"
+            exit 1
+          fi
+
+          echo "All labs passed!"
