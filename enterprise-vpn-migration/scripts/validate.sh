@@ -383,9 +383,9 @@ test_09_gre_tunnel_interfaces_exist() {
     local tests_passed=0
     local tests_failed=0
 
-    # Check router-a1 has gre0 interface
+    # Check router-a1 has gre0 interface (GRE shows state UNKNOWN when up, check flags for UP)
     if exec_in_container router-a1 ip link show gre0 2>/dev/null | grep -q "gre0"; then
-        if exec_in_container router-a1 ip link show gre0 | grep -q "state UP"; then
+        if exec_in_container router-a1 ip link show gre0 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
             print_info "router-a1 gre0 interface exists and is UP"
             tests_passed=$((tests_passed + 1))
         else
@@ -397,9 +397,9 @@ test_09_gre_tunnel_interfaces_exist() {
         tests_failed=$((tests_failed + 1))
     fi
 
-    # Check router-b1 has gre0 interface
+    # Check router-b1 has gre0 interface (GRE shows state UNKNOWN when up, check flags for UP)
     if exec_in_container router-b1 ip link show gre0 2>/dev/null | grep -q "gre0"; then
-        if exec_in_container router-b1 ip link show gre0 | grep -q "state UP"; then
+        if exec_in_container router-b1 ip link show gre0 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
             print_info "router-b1 gre0 interface exists and is UP"
             tests_passed=$((tests_passed + 1))
         else
