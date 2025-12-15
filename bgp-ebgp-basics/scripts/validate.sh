@@ -10,7 +10,8 @@ FAILED=0
 
 # Test 1: Check BGP neighbor on r1 (to r2)
 echo "Test 1: Checking BGP neighbor on r1 (AS 100 -> AS 200)..."
-if docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary" 2>/dev/null | grep -q "200.*Established"; then
+# Check if neighbor shows prefix count (numeric) instead of state like Idle/Connect
+if docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary" 2>/dev/null | grep "10.1.1.2" | grep -qE "[0-9]+\s+[0-9]+\s+N/A$"; then
     echo "  ✓ PASSED - r1 has established BGP session with AS 200"
     ((PASSED++))
 else
@@ -21,7 +22,8 @@ echo ""
 
 # Test 2: Check BGP neighbors on r2 (to r1 and r3)
 echo "Test 2: Checking BGP neighbors on r2 (AS 200)..."
-NEIGHBORS=$(docker exec clab-bgp-ebgp-basics-r2 vtysh -c "show ip bgp summary" 2>/dev/null | grep "Established" | wc -l)
+# Count neighbors with prefix count (established sessions show numeric PfxRcd)
+NEIGHBORS=$(docker exec clab-bgp-ebgp-basics-r2 vtysh -c "show ip bgp summary" 2>/dev/null | grep -E "10\.[0-9]+\.[0-9]+\.[0-9]+.*[0-9]+\s+[0-9]+\s+N/A$" | wc -l)
 if [ "$NEIGHBORS" -ge 2 ]; then
     echo "  ✓ PASSED - r2 has 2 established BGP sessions"
     ((PASSED++))
@@ -65,9 +67,9 @@ else
 fi
 echo ""
 
-# Test 6: Connectivity test
+# Test 6: Connectivity test (use loopback as source to ensure BGP routing)
 echo "Test 6: Testing connectivity from r1 to r3's loopback..."
-if docker exec clab-bgp-ebgp-basics-r1 ping -c 2 192.168.3.1 >/dev/null 2>&1; then
+if docker exec clab-bgp-ebgp-basics-r1 ping -c 2 -I 192.168.1.1 192.168.3.1 >/dev/null 2>&1; then
     echo "  ✓ PASSED - r1 can ping 192.168.3.1 (r3)"
     ((PASSED++))
 else
