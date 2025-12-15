@@ -15,8 +15,7 @@ topology:
       image: alpine:latest
       exec:
         - ip addr add 192.168.100.10/24 dev eth1
-        - ip route del default || true
-        - ip route add default via 192.168.100.1
+        - sh -c "ip route del default 2>/dev/null; ip route add default via 192.168.100.1"
         - apk add --no-cache curl
 
     internet:
