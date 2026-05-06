@@ -1,164 +1,131 @@
-# Free Containerlab Network Labs 🚀
+# Free Containerlab Network Labs
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Labs](https://img.shields.io/badge/labs-6-blue.svg)](.)
 [![Containerlab](https://img.shields.io/badge/containerlab-latest-green.svg)](https://containerlab.dev/)
 [![CI](https://github.com/ciscoittech/containerlab-free-labs/workflows/Validate%20Labs/badge.svg)](https://github.com/ciscoittech/containerlab-free-labs/actions)
 
-**Modern, lightweight network labs using Containerlab and FRR routing**
+**Hands-on network labs that run in seconds, not hours.** Built with [Containerlab](https://containerlab.dev/) and [FRR](https://frrouting.org/) so you can practice real routing protocols without expensive hardware or heavy VMs.
 
 [![Run in Codespaces](.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?quickstart=1)
 
-> Learn OSPF, BGP, and Linux networking with hands-on containerized labs. No VMs required!
+---
 
-## Why Containerlab?
+## What's This?
 
-Traditional network labs (GNS3, EVE-NG) require heavy virtual machines and complex setup. These containerized labs offer:
+If you've ever spent hours setting up GNS3 or EVE-NG just to practice OSPF, this is for you. Each lab spins up a full network topology using Docker containers in about 30 seconds. You get real router CLIs, real routing protocols, and real troubleshooting — without the overhead.
 
-- ✅ **75% less memory** - ~50MB per router vs 1GB+ for VM-based labs
-- ✅ **96% faster startup** - 30 seconds vs 10+ minutes
-- ✅ **Zero configuration** - One-click deployment with VS Code devcontainers
-- ✅ **Modern approach** - Docker containers, not VMs
+**How it compares:**
 
-## 🎓 Available Labs
+| | Containerlab (this repo) | GNS3 / EVE-NG |
+|---|---|---|
+| Memory per router | ~50 MB | 1 GB+ |
+| Startup time | ~30 seconds | 10+ minutes |
+| Setup | `git clone` + one command | Download ISOs, configure VMs, pray |
+| Cost | Free | Free (but needs beefy hardware) |
 
-| Lab | Difficulty | Time | Topics | Tests |
-|-----|-----------|------|--------|-------|
-| [**OSPF Basics**](ospf-basics/) | ⭐⭐ Beginner | 45 min | OSPF single-area, neighbor adjacency, DR/BDR election | 6 |
-| [**BGP eBGP Basics**](bgp-ebgp-basics/) | ⭐⭐ Beginner | 60 min | eBGP peering, AS-path, route advertisement | 6 |
-| [**Linux Network Namespaces**](linux-network-namespaces/) | ⭐ Beginner | 30 min | Network namespaces, veth pairs, IP forwarding | 5 |
-| [**VyOS Firewall Basics**](vyos-firewall-basics/) | ⭐⭐ Beginner | 45 min | Zone-based firewall, NAT, traffic filtering | 5 |
-| [**Enterprise VPN Migration**](enterprise-vpn-migration/) | ⭐⭐⭐ Advanced | 90 min | GRE tunnels, OSPF+BGP, site-to-site VPN, migration runbook | 22 |
-| [**Zero Trust Fundamentals**](zero-trust-fundamentals/) | ⭐⭐ Intermediate | 45 min | JWT auth, microservices, identity-based access control | 5 |
+Perfect for CCNA, CCNP, and anyone learning network engineering.
 
-### 1. OSPF Basics
-Learn OSPF fundamentals with a simple 3-router topology. Perfect for understanding OSPF operation, DR/BDR election, and basic troubleshooting.
+---
 
-[**→ Start OSPF Lab**](ospf-basics/)
+## Labs
 
-### 2. BGP eBGP Basics
-Understand external BGP with a 4-router, 3-AS topology. Learn BGP neighbor establishment, route propagation, and AS-path manipulation.
+Six labs, beginner to advanced. Each one includes automated validation so you know when you've got it right.
 
-[**→ Start BGP Lab**](bgp-ebgp-basics/)
+| Lab | Level | Time | What You'll Learn |
+|-----|-------|------|-------------------|
+| [Linux Network Namespaces](linux-network-namespaces/) | Beginner | 30 min | How containers create isolated networks under the hood |
+| [OSPF Basics](ospf-basics/) | Beginner | 45 min | Single-area OSPF, neighbor adjacency, DR/BDR election |
+| [BGP eBGP Basics](bgp-ebgp-basics/) | Beginner | 60 min | eBGP peering across 3 autonomous systems, AS-path |
+| [VyOS Firewall Basics](vyos-firewall-basics/) | Beginner | 45 min | Zone-based firewall, traffic filtering, NAT |
+| [Zero Trust Fundamentals](zero-trust-fundamentals/) | Intermediate | 45 min | JWT auth, microservices, identity-based access |
+| [Enterprise VPN Migration](enterprise-vpn-migration/) | Advanced | 90 min | 16-container, 2-site GRE VPN migration with rollback |
 
-### 3. Linux Network Namespaces
-Explore how containerlab uses Linux network namespaces to create isolated network environments. Understand the foundation of container networking.
+### Recommended order
 
-[**→ Start Linux Namespaces Lab**](linux-network-namespaces/)
+Start at the top and work your way down. Each lab builds on concepts from the previous ones.
 
-### 4. VyOS Firewall Basics
-Configure zone-based firewall policies using VyOS. Learn traffic filtering, NAT, and network segmentation fundamentals.
+1. **Linux Namespaces** — understand how containerlab works under the hood
+2. **OSPF** — your first routing protocol
+3. **BGP** — how the internet routes traffic between networks
+4. **Firewall** — add security between zones
+5. **Zero Trust** — modern identity-based access control
+6. **Enterprise VPN** — put it all together in a real-world migration scenario
 
-[**→ Start VyOS Firewall Lab**](vyos-firewall-basics/)
+---
 
-### 5. Enterprise VPN Migration
-Tackle a real-world scenario: migrate a site-to-site GRE VPN between two offices with minimal downtime. Includes 16 containers across 2 sites with OSPF, BGP, firewalls, and application services.
+## Quick Start
 
-[**→ Start Enterprise VPN Lab**](enterprise-vpn-migration/)
+### Option 1: GitHub Codespaces (easiest)
 
-### 6. Zero Trust Fundamentals
-Build and explore a zero-trust microservices architecture with JWT authentication, identity verification, and protected API endpoints.
+Click the button above. That's it. Everything is pre-installed.
 
-[**→ Start Zero Trust Lab**](zero-trust-fundamentals/)
+### Option 2: Run locally
 
-## ✨ SSH Access to Routers
+```bash
+# Install containerlab (Linux or Mac)
+bash -c "$(curl -sL https://get.containerlab.dev)"
 
-All labs include **SSH access with auto-login to router CLI** - just like real Cisco/Juniper routers!
+# Clone and build
+git clone https://github.com/ciscoittech/containerlab-free-labs.git
+cd containerlab-free-labs
+./build-frr-ssh.sh    # builds the router image (first time only)
 
-**Credentials:**
-- Username: `admin`
-- Password: `cisco`
+# Pick a lab and deploy
+cd ospf-basics
+sudo containerlab deploy -t topology.clab.yml
 
-**Access methods:**
-1. **VS Code Extension** (easiest) - Right-click container → SSH
-2. **Port mapping** - `ssh -p 2221 admin@localhost`
-3. **Container name** - `ssh admin@clab-ospf-basics-r1`
+# SSH into a router — you'll land right at the CLI
+ssh -p 2221 admin@localhost
+# Password: cisco
 
-**You land directly at the router CLI:**
+# When you're done
+sudo containerlab destroy -t topology.clab.yml
+```
+
+### Accessing Routers
+
+Every FRR router has SSH enabled. Login and you land directly at the router CLI, just like a real Cisco or Juniper box.
+
 ```
 $ ssh -p 2221 admin@localhost
 Password: cisco
 
-r1#  ← Router CLI (not bash shell!)
 r1# show ip ospf neighbor
 r1# show ip route
+r1# show ip bgp summary
 ```
 
-See [SSH-SETUP-COMPLETE.md](SSH-SETUP-COMPLETE.md) for complete documentation.
+**Credentials:** `admin` / `cisco`
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-```bash
-# Install containerlab (Linux/Mac)
-bash -c "$(curl -sL https://get.containerlab.dev)"
-
-# Verify installation
-containerlab version
-```
-
-### Run a Lab
-
-```bash
-# Clone this repo
-git clone https://github.com/ciscoittech/containerlab-free-labs.git
-cd containerlab-free-labs
-
-# Build frr-ssh image (first time only)
-./build-frr-ssh.sh
-
-# Option 1: Run in VS Code with devcontainer (recommended)
-cd ospf-basics
-code .  # Click "Reopen in Container"
-
-# Option 2: Run locally
-cd ospf-basics
-sudo containerlab deploy -t topology.clab.yml
-
-# Access routers via SSH (recommended)
-ssh -p 2221 admin@localhost  # OSPF r1
-# Password: cisco
-# Lands directly at router CLI: r1#
-
-# Alternative: Docker exec
-docker exec -it clab-ospf-basics-r1 vtysh
-
-# Cleanup
-sudo containerlab destroy -t topology.clab.yml
-```
-
-## 📚 Learning Path
-
-1. **Start here**: Linux Network Namespaces (understand the foundation)
-2. **OSPF Basics**: Learn link-state routing protocols
-3. **BGP eBGP Basics**: Understand internet routing fundamentals
-4. **VyOS Firewall Basics**: Add security with zone-based firewalls
-5. **Zero Trust Fundamentals**: Explore identity-based access control
-6. **Enterprise VPN Migration**: Put it all together in a real-world scenario
-
-## 🤝 Contributing
-
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Quick start**:
-1. Fork this repo
-2. Create a feature branch (`git checkout -b feature/new-lab`)
-3. Test in devcontainer (`./scripts/validate.sh`)
-4. Submit a PR
-
-**Want to add a lab?** Check our [lab template](CONTRIBUTING.md#contributing-new-labs)
-
-## 📖 Resources
-
-- [Containerlab Documentation](https://containerlab.dev/)
-- [FRRouting Documentation](https://docs.frrouting.org/)
-- [Network Automation Community](https://networkautomation.forum/)
-
-## 📜 License
-
-MIT License - Use these labs for learning, teaching, or building your own projects!
+You can also connect via VS Code (right-click container, SSH) or Docker exec (`docker exec -it clab-ospf-basics-r1 vtysh`).
 
 ---
 
-**Note**: These labs use FRR (Free Range Routing) which provides Cisco-like syntax for BGP, OSPF, IS-IS, and more. Perfect for CCNA/CCNP lab practice without expensive hardware!
+## Who This Is For
+
+- **CCNA / CCNP students** — practice routing protocols with Cisco-like CLI syntax
+- **Network engineers** — spin up quick topologies to test ideas
+- **Career switchers** — learn networking hands-on without buying hardware
+- **Instructors** — give students lab environments that just work
+
+## Contributing
+
+Got an idea for a lab? Found a bug? PRs are welcome.
+
+1. Fork this repo
+2. Create a branch (`git checkout -b feature/my-lab`)
+3. Test with the validation scripts (`./scripts/validate.sh`)
+4. Open a PR
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Resources
+
+- [Containerlab Docs](https://containerlab.dev/) — the tool that makes this possible
+- [FRRouting Docs](https://docs.frrouting.org/) — the routing suite behind the router CLIs
+- [Codespaces Guide](README-CODESPACES.md) — detailed setup for GitHub Codespaces
+
+## License
+
+MIT — use these labs for learning, teaching, corporate training, whatever you want.
