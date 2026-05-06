@@ -21,7 +21,7 @@ topology:
       exec:
         - ip addr add 100.64.0.1/24 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
-        - ip route add default via 100.64.0.254
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
         - apk add --no-cache iptables tcpdump curl
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
@@ -48,6 +48,8 @@ topology:
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.10/24 dev eth3
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/router-a1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a1/daemons:/etc/frr/daemons:ro
@@ -84,7 +86,7 @@ topology:
         - ip addr add 10.1.20.4/24 dev eth3  # DNS-A segment
         - ip addr add 10.1.20.5/24 dev eth4  # LDAP-A segment
         - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
-        - ip route add default via 10.1.20.1
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
 
     # Web-A (nginx web server)
     web-a:
@@ -92,7 +94,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.10/24 dev eth1
-        - ip route add default via 10.1.20.3
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.3'"
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
@@ -104,7 +106,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.11/24 dev eth1
-        - ip route add default via 10.1.20.4
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.4'"
         - apk add --no-cache dnsmasq bind-tools
         # Configure dnsmasq
         - echo "address=/web-a.site-a.local/10.1.20.10" > /etc/dnsmasq.conf
@@ -119,7 +121,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.12/24 dev eth1
-        - ip route add default via 10.1.20.5
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.5'"
         - apk add --no-cache openldap openldap-back-mdb openldap-clients netcat-openbsd
         # Start slapd on port 389
         - mkdir -p /var/lib/openldap/openldap-data
@@ -133,7 +135,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.13/24 dev eth1
-        - ip route add default via 10.1.20.6
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.6'"
         - apk add --no-cache curl netcat-openbsd
         - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\n{ok}\" | nc -l -p 3000 -w 1; done &'"
 
@@ -148,7 +150,7 @@ topology:
       exec:
         - ip addr add 100.64.0.2/24 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
-        - ip route add default via 100.64.0.254
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
         - apk add --no-cache iptables tcpdump curl
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
@@ -175,6 +177,8 @@ topology:
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.20/24 dev eth3
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/router-b1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b1/daemons:/etc/frr/daemons:ro
@@ -209,7 +213,7 @@ topology:
         - ip addr add 10.2.20.2/24 dev eth1
         - ip addr add 10.2.20.3/24 dev eth2  # Web-B segment
         - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
-        - ip route add default via 10.2.20.1
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.1'"
 
     # Web-B (nginx web server)
     web-b:
@@ -217,7 +221,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.10/24 dev eth1
-        - ip route add default via 10.2.20.3
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.3'"
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
@@ -229,7 +233,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.11/24 dev eth1
-        - ip route add default via 10.2.20.4
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.4'"
         - apk add --no-cache curl bind-tools netcat-openbsd traceroute
 
     #########################################################################
@@ -254,6 +258,8 @@ topology:
         # Configure BGP peering IPs
         - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
         - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/internet-core/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/internet-core/daemons:/etc/frr/daemons:ro
@@ -264,7 +270,7 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.14/24 dev eth1
-        - ip route add default via 10.1.20.1
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
         - apk add --no-cache curl netcat-openbsd
         - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\nNetBox IPAM\" | nc -l -p 8000 -w 1; done &'"
 
