@@ -21,8 +21,8 @@ topology:
       exec:
         - ip addr add 100.64.0.1/24 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
         - apk add --no-cache iptables tcpdump curl
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
     router-a1:
@@ -94,11 +94,11 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.10/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.3'"
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.3'"
 
     # DNS-A (dnsmasq DNS server)
     dns-a:
@@ -106,13 +106,13 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.11/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.4'"
         - apk add --no-cache dnsmasq bind-tools
         # Configure dnsmasq
         - echo "address=/web-a.site-a.local/10.1.20.10" > /etc/dnsmasq.conf
         - echo "address=/web-b.site-b.local/10.2.20.10" >> /etc/dnsmasq.conf
         - echo "address=/dns-a.site-a.local/10.1.20.11" >> /etc/dnsmasq.conf
         - echo "address=/ldap-a.site-a.local/10.1.20.12" >> /etc/dnsmasq.conf
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.4'"
         - dnsmasq --no-daemon --log-queries &
 
     # LDAP-A (OpenLDAP directory server)
@@ -121,12 +121,12 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.12/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.5'"
         - apk add --no-cache openldap openldap-back-mdb openldap-clients netcat-openbsd
         # Start slapd on port 389
         - mkdir -p /var/lib/openldap/openldap-data
         - chown ldap:ldap /var/lib/openldap/openldap-data
         # Note: Full LDAP config would be in production, simplified for lab
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.5'"
         - nc -l -p 389 &  # Simple listener for connectivity testing
 
     # Monitor-A (monitoring dashboard placeholder)
@@ -135,8 +135,8 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.13/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.6'"
         - apk add --no-cache curl netcat-openbsd
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.6'"
         - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\n{ok}\" | nc -l -p 3000 -w 1; done &'"
 
     #########################################################################
@@ -150,8 +150,8 @@ topology:
       exec:
         - ip addr add 100.64.0.2/24 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
         - apk add --no-cache iptables tcpdump curl
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
     router-b1:
@@ -221,11 +221,11 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.10/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.3'"
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.3'"
 
     # Server-B (general application server)
     server-b:
@@ -233,8 +233,8 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.11/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.4'"
         - apk add --no-cache curl bind-tools netcat-openbsd traceroute
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.4'"
 
     #########################################################################
     # Internet Backbone (Simulated ISP Core)
@@ -270,8 +270,8 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.14/24 dev eth1
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
         - apk add --no-cache curl netcat-openbsd
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
         - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\nNetBox IPAM\" | nc -l -p 8000 -w 1; done &'"
 
   links:
