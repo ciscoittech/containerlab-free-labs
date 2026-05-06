@@ -151,7 +151,7 @@ topology:
         - ip addr add 10.1.20.13/24 dev eth1
         - ip route add default via 10.1.20.6
         - apk add --no-cache curl netcat-openbsd
-        - sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"status\":\"ok\"}' | nc -l -p 3000 -w 1; done &"
+        - sh -c 'while true; do printf "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"status\":\"ok\"}" | nc -l -p 3000 -w 1; done &'
 
     #########################################################################
     # Site B - Remote Office (Austin, TX)
@@ -299,7 +299,7 @@ topology:
         - ip addr add 10.1.20.14/24 dev eth1
         - ip route add default via 10.1.20.1
         - apk add --no-cache curl netcat-openbsd
-        - sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>NetBox IPAM</h1></body></html>' | nc -l -p 8000 -w 1; done &"
+        - sh -c 'while true; do printf "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\nNetBox IPAM Placeholder" | nc -l -p 8000 -w 1; done &'
 
   links:
     #########################################################################

@@ -725,7 +725,7 @@ test_22_netbox_accessible() {
     fi
 
     # Check if Netbox web interface responds
-    if exec_in_container web-a curl -s -m 5 http://10.1.20.14:8000 | grep -q "NetBox"; then
+    if exec_in_container web-a curl -s -m 5 http://10.1.20.14:8000 | grep -qi "netbox"; then
         print_info "Netbox web interface is responding"
     else
         print_fail "Netbox web interface is not responding"
