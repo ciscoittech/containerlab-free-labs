@@ -695,24 +695,24 @@ test_20_no_routing_loops() {
 #############################################################################
 
 test_21_grafana_accessible() {
-    print_test "Verify Grafana dashboard is accessible (10.1.20.13:3000)"
+    print_test "Verify monitoring service is accessible (10.1.20.13:3000)"
 
-    # Check if Grafana container is running
+    # Check if monitor-a container is running
     if ! is_container_running "monitor-a"; then
-        print_fail "Grafana container (monitor-a) is not running"
+        print_fail "Monitor container (monitor-a) is not running"
         return 1
     fi
 
-    # Check if Grafana web interface responds
-    if exec_in_container web-a curl -s -m 5 http://10.1.20.13:3000/api/health | grep -q "ok"; then
-        print_info "Grafana health check returned 'ok'"
+    # Check if monitoring service responds
+    if exec_in_container web-a curl -s -m 5 http://10.1.20.13:3000 | grep -q "ok"; then
+        print_info "Monitoring service health check returned 'ok'"
     else
-        print_fail "Grafana health check failed"
-        exec_in_container web-a curl -v http://10.1.20.13:3000/api/health
+        print_fail "Monitoring service health check failed"
+        exec_in_container web-a curl -v http://10.1.20.13:3000
         return 1
     fi
 
-    print_pass "Grafana dashboard is accessible and healthy"
+    print_pass "Monitoring service is accessible and healthy"
 }
 
 test_22_netbox_accessible() {

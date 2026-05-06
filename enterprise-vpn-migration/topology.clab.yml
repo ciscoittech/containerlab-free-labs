@@ -2,13 +2,9 @@ name: enterprise-vpn-migration
 
 mgmt:
   network: vpn-mgmt
-  ipv4_subnet: 172.20.20.0/24
+  ipv4-subnet: 172.20.20.0/24
 
 topology:
-  kinds:
-    linux:
-      cmd: sh
-
   defaults:
     env:
       CLAB_SSH_CONNECTION: cisco@%h:%p
@@ -88,7 +84,6 @@ topology:
     firewall-a:
       kind: linux
       image: ghcr.io/sever-sever/vyos-container:latest
-      cmd: /sbin/init
       exec:
         # Configure interfaces
         - ip addr add 10.1.20.2/24 dev eth1
@@ -148,18 +143,15 @@ topology:
       binds:
         - /etc/localtime:/etc/localtime:ro
 
-    # Monitor-A (Grafana monitoring dashboard)
+    # Monitor-A (monitoring dashboard placeholder)
     monitor-a:
       kind: linux
-      image: grafana/grafana:latest
-      env:
-        GF_INSTALL_PLUGINS: ""
-        GF_SERVER_HTTP_PORT: "3000"
+      image: alpine:3.18
       exec:
         - ip addr add 10.1.20.13/24 dev eth1
         - ip route add default via 10.1.20.6
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - apk add --no-cache curl netcat-openbsd
+        - sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"status\":\"ok\"}' | nc -l -p 3000 -w 1; done &"
 
     #########################################################################
     # Site B - Remote Office (Austin, TX)
@@ -235,7 +227,6 @@ topology:
     firewall-b:
       kind: linux
       image: ghcr.io/sever-sever/vyos-container:latest
-      cmd: /sbin/init
       exec:
         # Configure interfaces
         - ip addr add 10.2.20.2/24 dev eth1
@@ -300,23 +291,15 @@ topology:
         - ./configs/internet-core/daemons:/etc/frr/daemons:ro
         - /etc/localtime:/etc/localtime:ro
 
-    # Netbox (IPAM and network documentation)
+    # Netbox (IPAM placeholder — lightweight substitute for lab networking)
     netbox:
       kind: linux
-      image: netboxcommunity/netbox:latest
-      env:
-        SKIP_SUPERUSER: "true"
-        DB_HOST: "localhost"
-        DB_NAME: "netbox"
-        DB_USER: "netbox"
-        DB_PASSWORD: "netbox"
-        REDIS_HOST: "localhost"
-        SECRET_KEY: "r8OwDz)YPf1K*Fh@m@T!3D8BcQnN4MfWQ1w-kF%7EX0rJU9uGBL8"
+      image: alpine:3.18
       exec:
         - ip addr add 10.1.20.14/24 dev eth1
         - ip route add default via 10.1.20.1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - apk add --no-cache curl netcat-openbsd
+        - sh -c "while true; do echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>NetBox IPAM</h1></body></html>' | nc -l -p 8000 -w 1; done &"
 
   links:
     #########################################################################

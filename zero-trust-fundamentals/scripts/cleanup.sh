@@ -13,7 +13,7 @@ echo ""
 
 cd "$LAB_DIR"
 
-docker-compose down -v
+docker compose down -v
 
 echo ""
 echo "Lab cleaned up successfully!"

@@ -19,7 +19,7 @@ echo ""
 cd "$LAB_DIR"
 
 echo "Building and starting services..."
-docker-compose up -d --build
+docker compose up -d --build
 
 echo ""
 echo "Waiting 30 seconds for services to initialize..."
