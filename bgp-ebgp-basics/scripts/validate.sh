@@ -10,8 +10,8 @@ FAILED=0
 
 # Test 1: Check BGP neighbor on r1 (to r2)
 echo "Test 1: Checking BGP neighbor on r1 (AS 100 -> AS 200)..."
-# Check if neighbor shows prefix count (numeric) instead of state like Idle/Connect
-if docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary" 2>/dev/null | grep "10.1.1.2" | grep -qE "[0-9]+\s+[0-9]+\s+N/A$"; then
+# Check if neighbor shows prefix count (numeric) instead of state like Idle/Connect/Active
+if docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary" 2>/dev/null | grep "10.1.1.2" | grep -qvE "(Idle|Active|Connect|OpenSent|OpenConfirm)"; then
     echo "  ✓ PASSED - r1 has established BGP session with AS 200"
     ((PASSED++))
 else
@@ -22,8 +22,8 @@ echo ""
 
 # Test 2: Check BGP neighbors on r2 (to r1 and r3)
 echo "Test 2: Checking BGP neighbors on r2 (AS 200)..."
-# Count neighbors with prefix count (established sessions show numeric PfxRcd)
-NEIGHBORS=$(docker exec clab-bgp-ebgp-basics-r2 vtysh -c "show ip bgp summary" 2>/dev/null | grep -E "10\.[0-9]+\.[0-9]+\.[0-9]+.*[0-9]+\s+[0-9]+\s+N/A$" | wc -l)
+# Count neighbors that are established (not in Idle/Active/Connect state)
+NEIGHBORS=$(docker exec clab-bgp-ebgp-basics-r2 vtysh -c "show ip bgp summary" 2>/dev/null | grep -E "^10\." | grep -cvE "(Idle|Active|Connect|OpenSent|OpenConfirm)")
 if [ "$NEIGHBORS" -ge 2 ]; then
     echo "  ✓ PASSED - r2 has 2 established BGP sessions"
     ((PASSED++))

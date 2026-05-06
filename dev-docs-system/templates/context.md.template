@@ -1,0 +1,240 @@
+# [Feature Name] - Development Context
+
+**Last Updated**: [Timestamp]
+**Current Status**: [Phase X in progress]
+
+---
+
+## Quick Start
+
+**To resume work**:
+1. Read this file for current state
+2. Check `[feature]-tasks.md` for next task
+3. Review `[feature]-plan.md` for architecture reference
+4. Continue where left off
+
+---
+
+## Key Files & Locations
+
+### Backend Files
+- `path/to/service.ext` - [Purpose/responsibility]
+- `path/to/controller.ext` - [Purpose/responsibility]
+- `path/to/model.ext` - [Purpose/responsibility]
+
+### Frontend Files
+- `path/to/component.ext` - [Purpose/responsibility]
+- `path/to/page.ext` - [Purpose/responsibility]
+
+### Configuration
+- `path/to/config.ext` - [Purpose/responsibility]
+
+### Tests
+- `path/to/test.ext` - [Purpose/responsibility]
+
+---
+
+## Architecture Decisions Made
+
+### Decision 1: [Topic]
+**Date**: [When decided]
+**Decision**: [What was decided]
+**Rationale**: [Why this approach]
+**Alternatives Considered**: [Other options]
+**Impact**: [Consequences of this choice]
+
+### Decision 2: [Topic]
+**Date**: [When decided]
+**Decision**: [What was decided]
+**Rationale**: [Why this approach]
+
+---
+
+## Session Work Summary
+
+### Session [Date] - [Duration]
+
+**Completed**:
+- ✅ Task 1 completed
+- ✅ Task 2 completed
+- ✅ Task 3 completed
+
+**Discoveries**:
+- Discovery 1: [What we learned]
+- Discovery 2: [What we learned]
+
+**Blockers Encountered**:
+- Blocker 1: [Description]
+  - Status: [Resolved/Open]
+  - Solution: [If resolved]
+
+**Next Steps**:
+1. Next immediate task
+2. Following task
+3. Future task
+
+---
+
+## Technical Discoveries
+
+### Discovery 1: [Topic]
+**What We Found**: [Description]
+**Impact**: [How this affects implementation]
+**Action**: [What we did about it]
+
+### Discovery 2: [Topic]
+**What We Found**: [Description]
+**Impact**: [How this affects implementation]
+
+---
+
+## Known Issues & Blockers
+
+### Active Blockers
+**Blocker 1: [Description]**
+- Blocking: [What tasks are blocked]
+- Impact: [High/Medium/Low]
+- Status: [Open/In Progress/Resolved]
+- Next Action: [What needs to happen]
+
+### Resolved Blockers
+**Blocker 1: [Description]**
+- Resolution: [How it was solved]
+- Date Resolved: [When]
+
+---
+
+## What's Working Well
+
+✅ **Success 1**: [Description]
+- Why: [Reason for success]
+
+✅ **Success 2**: [Description]
+- Why: [Reason for success]
+
+---
+
+## What Needs Attention
+
+⚠️  **Concern 1**: [Description]
+- Priority: [High/Medium/Low]
+- Suggested Action: [What to do]
+
+⚠️  **Concern 2**: [Description]
+- Priority: [High/Medium/Low]
+
+---
+
+## Next Steps (Priority Order)
+
+### Immediate (This Session)
+1. [ ] Task 1 - [Description]
+2. [ ] Task 2 - [Description]
+
+### Short Term (This Week)
+1. [ ] Task 1 - [Description]
+2. [ ] Task 2 - [Description]
+
+### Medium Term (This Month)
+1. [ ] Task 1 - [Description]
+2. [ ] Task 2 - [Description]
+
+---
+
+## Performance Notes
+
+### Current Performance
+- Metric 1: [Value]
+- Metric 2: [Value]
+
+### Performance Concerns
+- Concern 1: [Description and impact]
+
+### Optimization Opportunities
+- Opportunity 1: [Description]
+
+---
+
+## Security Notes
+
+### Security Considerations
+- Consideration 1: [Description]
+- Consideration 2: [Description]
+
+### Security Implementations
+- ✅ Implemented 1: [Description]
+- ⏳ Pending 1: [Description]
+
+---
+
+## Testing Notes
+
+### Test Coverage
+- Unit tests: [X passing / Y total]
+- Integration tests: [X passing / Y total]
+- E2E tests: [X passing / Y total]
+
+### Testing Gaps
+- Gap 1: [What's not tested yet]
+- Gap 2: [What's not tested yet]
+
+---
+
+## Open Questions
+
+1. **Question 1**: [Description]
+   - Impact: [High/Medium/Low]
+   - Need answer by: [When]
+
+2. **Question 2**: [Description]
+   - Impact: [High/Medium/Low]
+
+---
+
+## Resource Links
+
+### Documentation
+- Plan: `dev/active/[feature]/[feature]-plan.md`
+- Tasks: `dev/active/[feature]/[feature]-tasks.md`
+
+### External References
+- Link 1: [URL] - [Description]
+- Link 2: [URL] - [Description]
+
+### Related Issues
+- Issue #X: [Description]
+- Issue #Y: [Description]
+
+---
+
+## Team Communication
+
+### Key Updates to Share
+- Update 1: [What team needs to know]
+- Update 2: [What team needs to know]
+
+### Questions for Team
+- Question 1: [For team discussion]
+- Question 2: [For team discussion]
+
+---
+
+## Lessons Learned
+
+### Lesson 1: [Topic]
+**What We Learned**: [Description]
+**Application**: [How to apply this learning]
+
+### Lesson 2: [Topic]
+**What We Learned**: [Description]
+**Application**: [How to apply this learning]
+
+---
+
+## Update History
+
+**[Date Time]**: Updated after session X
+- Summary of changes
+
+**[Date Time]**: Updated after session Y
+- Summary of changes

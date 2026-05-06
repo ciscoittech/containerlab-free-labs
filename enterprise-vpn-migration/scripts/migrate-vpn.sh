@@ -100,7 +100,7 @@ exec_step "1.2" "Verify old WAN IP on router-b1 (198.51.100.10)" "router-b1" \
     ip addr show eth2
 
 exec_step "1.3" "Verify GRE tunnel status on router-a1" "router-a1" \
-    ip tunnel show gre0
+    ip tunnel show gre1
 
 exec_step "1.4" "Test VPN connectivity (ping across tunnel)" "router-a1" \
     ping -c 3 172.16.0.2
@@ -144,17 +144,17 @@ echo ""
 echo -e "${YELLOW}ℹ Creating new GRE tunnel using new WAN IPs${NC}"
 echo ""
 
-exec_step "3.1" "Create new GRE tunnel (gre1) on router-a1" "router-a1" \
-    ip tunnel add gre1 mode gre remote 192.0.2.20 local 192.0.2.10 ttl 255
+exec_step "3.1" "Create new GRE tunnel (gre2) on router-a1" "router-a1" \
+    ip tunnel add gre2 mode gre remote 192.0.2.20 local 192.0.2.10 ttl 255
 
 exec_step "3.2" "Assign IP to new tunnel on router-a1" "router-a1" \
-    sh -c "ip addr add 172.16.1.1/30 dev gre1 && ip link set gre1 up"
+    sh -c "ip addr add 172.16.1.1/30 dev gre2 && ip link set gre2 up"
 
-exec_step "3.3" "Create new GRE tunnel (gre1) on router-b1" "router-b1" \
-    ip tunnel add gre1 mode gre remote 192.0.2.10 local 192.0.2.20 ttl 255
+exec_step "3.3" "Create new GRE tunnel (gre2) on router-b1" "router-b1" \
+    ip tunnel add gre2 mode gre remote 192.0.2.10 local 192.0.2.20 ttl 255
 
 exec_step "3.4" "Assign IP to new tunnel on router-b1" "router-b1" \
-    sh -c "ip addr add 172.16.1.2/30 dev gre1 && ip link set gre1 up"
+    sh -c "ip addr add 172.16.1.2/30 dev gre2 && ip link set gre2 up"
 
 exec_step "3.5" "Test new tunnel connectivity" "router-a1" \
     ping -c 3 172.16.1.2
@@ -168,11 +168,11 @@ echo ""
 echo -e "${BLUE}========== Phase 4: Migrate OSPF to New Tunnel ==========${NC}"
 echo ""
 
-exec_step "4.1" "Add gre1 to OSPF on router-a1" "router-a1" \
-    vtysh -c "conf t" -c "interface gre1" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "end"
+exec_step "4.1" "Add gre2 to OSPF on router-a1" "router-a1" \
+    vtysh -c "conf t" -c "interface gre2" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "end"
 
-exec_step "4.2" "Add gre1 to OSPF on router-b1" "router-b1" \
-    vtysh -c "conf t" -c "interface gre1" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "end"
+exec_step "4.2" "Add gre2 to OSPF on router-b1" "router-b1" \
+    vtysh -c "conf t" -c "interface gre2" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "end"
 
 exec_step "4.3" "Verify OSPF neighbors on router-a1" "router-a1" \
     vtysh -c "show ip ospf neighbor"
@@ -195,22 +195,22 @@ echo -e "${BLUE}========== Phase 5: Remove Old Tunnel ==========${NC}"
 echo ""
 
 exec_step "5.1" "Remove old tunnel from OSPF on router-a1" "router-a1" \
-    vtysh -c "conf t" -c "interface gre0" -c "no ip ospf area 0" -c "end"
+    vtysh -c "conf t" -c "interface gre1" -c "no ip ospf area 0" -c "end"
 
 exec_step "5.2" "Remove old tunnel from OSPF on router-b1" "router-b1" \
-    vtysh -c "conf t" -c "interface gre0" -c "no ip ospf area 0" -c "end"
+    vtysh -c "conf t" -c "interface gre1" -c "no ip ospf area 0" -c "end"
 
 exec_step "5.3" "Shut down old tunnel on router-a1" "router-a1" \
-    ip link set gre0 down
+    ip link set gre1 down
 
 exec_step "5.4" "Shut down old tunnel on router-b1" "router-b1" \
-    ip link set gre0 down
+    ip link set gre1 down
 
 exec_step "5.5" "Delete old tunnel on router-a1" "router-a1" \
-    ip tunnel del gre0
+    ip tunnel del gre1
 
 exec_step "5.6" "Delete old tunnel on router-b1" "router-b1" \
-    ip tunnel del gre0
+    ip tunnel del gre1
 
 echo ""
 echo -e "${GREEN}✓ Old tunnel removed${NC}"

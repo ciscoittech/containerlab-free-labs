@@ -2,13 +2,9 @@ name: enterprise-vpn-migration
 
 mgmt:
   network: vpn-mgmt
-  ipv4_subnet: 172.20.20.0/24
+  ipv4-subnet: 172.20.20.0/24
 
 topology:
-  kinds:
-    linux:
-      cmd: sh
-
   defaults:
     env:
       CLAB_SSH_CONNECTION: cisco@%h:%p
@@ -25,10 +21,8 @@ topology:
       exec:
         - ip addr add 100.64.0.1/24 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
-        - ip route add default via 100.64.0.254
         - apk add --no-cache iptables tcpdump curl
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
     router-a1:
@@ -48,18 +42,17 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.10)
         - ip addr add 203.0.113.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
-        - ip addr add 172.16.0.1/30 dev gre0
-        - ip link set gre0 up
-        - ip link set gre0 mtu 1400
+        - ip tunnel add gre1 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+        - ip addr add 172.16.0.1/30 dev gre1
+        - ip link set gre1 up
+        - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.10/24 dev eth3
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/router-a1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a1/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-A2 (Core Router, OSPF)
     router-a2:
@@ -77,29 +70,23 @@ topology:
         - ip addr add 10.1.10.1/24 dev eth1
         # Configure server network gateway
         - ip addr add 10.1.20.1/24 dev eth2
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-a2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a2/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
-    # Firewall-A (Zone-based firewall with VyOS)
+    # Firewall-A (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-a:
       kind: linux
-      image: ghcr.io/sever-sever/vyos-container:latest
-      cmd: /sbin/init
+      image: alpine:3.18
       exec:
+        - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
         - ip addr add 10.1.20.2/24 dev eth1
         - ip addr add 10.1.20.3/24 dev eth2  # Web-A segment
         - ip addr add 10.1.20.4/24 dev eth3  # DNS-A segment
         - ip addr add 10.1.20.5/24 dev eth4  # LDAP-A segment
         - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
-        - ip route add default via 10.1.20.1
-        - sysctl -w net.ipv4.ip_forward=1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
 
     # Web-A (nginx web server)
     web-a:
@@ -107,13 +94,11 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.10/24 dev eth1
-        - ip route add default via 10.1.20.3
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.3'"
 
     # DNS-A (dnsmasq DNS server)
     dns-a:
@@ -121,16 +106,14 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.11/24 dev eth1
-        - ip route add default via 10.1.20.4
         - apk add --no-cache dnsmasq bind-tools
         # Configure dnsmasq
         - echo "address=/web-a.site-a.local/10.1.20.10" > /etc/dnsmasq.conf
         - echo "address=/web-b.site-b.local/10.2.20.10" >> /etc/dnsmasq.conf
         - echo "address=/dns-a.site-a.local/10.1.20.11" >> /etc/dnsmasq.conf
         - echo "address=/ldap-a.site-a.local/10.1.20.12" >> /etc/dnsmasq.conf
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.4'"
         - dnsmasq --no-daemon --log-queries &
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # LDAP-A (OpenLDAP directory server)
     ldap-a:
@@ -138,28 +121,23 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.1.20.12/24 dev eth1
-        - ip route add default via 10.1.20.5
         - apk add --no-cache openldap openldap-back-mdb openldap-clients netcat-openbsd
         # Start slapd on port 389
         - mkdir -p /var/lib/openldap/openldap-data
         - chown ldap:ldap /var/lib/openldap/openldap-data
         # Note: Full LDAP config would be in production, simplified for lab
-        - netcat -l -p 389 &  # Simple listener for connectivity testing
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.5'"
+        - nc -l -p 389 &  # Simple listener for connectivity testing
 
-    # Monitor-A (Grafana monitoring dashboard)
+    # Monitor-A (monitoring dashboard placeholder)
     monitor-a:
       kind: linux
-      image: grafana/grafana:latest
-      env:
-        GF_INSTALL_PLUGINS: ""
-        GF_SERVER_HTTP_PORT: "3000"
+      image: alpine:3.18
       exec:
         - ip addr add 10.1.20.13/24 dev eth1
-        - ip route add default via 10.1.20.6
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - apk add --no-cache curl netcat-openbsd
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.6'"
+        - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\n{ok}\" | nc -l -p 3000 -w 1; done &'"
 
     #########################################################################
     # Site B - Remote Office (Austin, TX)
@@ -172,10 +150,8 @@ topology:
       exec:
         - ip addr add 100.64.0.2/24 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
-        - ip route add default via 100.64.0.254
         - apk add --no-cache iptables tcpdump curl
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
     router-b1:
@@ -195,18 +171,17 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.20)
         - ip addr add 198.51.100.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
-        - ip addr add 172.16.0.2/30 dev gre0
-        - ip link set gre0 up
-        - ip link set gre0 mtu 1400
+        - ip tunnel add gre1 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+        - ip addr add 172.16.0.2/30 dev gre1
+        - ip link set gre1 up
+        - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.20/24 dev eth3
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/router-b1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b1/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-B2 (Core Router, OSPF)
     router-b2:
@@ -224,27 +199,21 @@ topology:
         - ip addr add 10.2.10.1/24 dev eth1
         # Configure server network gateway
         - ip addr add 10.2.20.1/24 dev eth2
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-b2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b2/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
-    # Firewall-B (Zone-based firewall with VyOS)
+    # Firewall-B (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-b:
       kind: linux
-      image: ghcr.io/sever-sever/vyos-container:latest
-      cmd: /sbin/init
+      image: alpine:3.18
       exec:
+        - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
         - ip addr add 10.2.20.2/24 dev eth1
         - ip addr add 10.2.20.3/24 dev eth2  # Web-B segment
         - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
-        - ip route add default via 10.2.20.1
-        - sysctl -w net.ipv4.ip_forward=1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.1'"
 
     # Web-B (nginx web server)
     web-b:
@@ -252,13 +221,11 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.10/24 dev eth1
-        - ip route add default via 10.2.20.3
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.3'"
 
     # Server-B (general application server)
     server-b:
@@ -266,10 +233,8 @@ topology:
       image: alpine:3.18
       exec:
         - ip addr add 10.2.20.11/24 dev eth1
-        - ip route add default via 10.2.20.4
         - apk add --no-cache curl bind-tools netcat-openbsd traceroute
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.4'"
 
     #########################################################################
     # Internet Backbone (Simulated ISP Core)
@@ -293,30 +258,21 @@ topology:
         # Configure BGP peering IPs
         - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
         - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
+        # Remove mgmt default route so FRR routing takes over
+        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
       binds:
         - ./configs/internet-core/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/internet-core/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
-    # Netbox (IPAM and network documentation)
+    # Netbox (IPAM placeholder — lightweight substitute for lab networking)
     netbox:
       kind: linux
-      image: netboxcommunity/netbox:latest
-      env:
-        SKIP_SUPERUSER: "true"
-        DB_HOST: "localhost"
-        DB_NAME: "netbox"
-        DB_USER: "netbox"
-        DB_PASSWORD: "netbox"
-        REDIS_HOST: "localhost"
-        SECRET_KEY: "r8OwDz)YPf1K*Fh@m@T!3D8BcQnN4MfWQ1w-kF%7EX0rJU9uGBL8"
+      image: alpine:3.18
       exec:
         - ip addr add 10.1.20.14/24 dev eth1
-        - ip route add default via 10.1.20.1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - apk add --no-cache curl netcat-openbsd
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
+        - "sh -c 'while true; do printf \"HTTP/1.1 200 OK\\r\\n\\r\\nNetBox IPAM\" | nc -l -p 8000 -w 1; done &'"
 
   links:
     #########################################################################

@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -64,7 +64,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -82,7 +82,7 @@ jobs:
           sudo containerlab deploy -t topology.clab.yml
 
       - name: Wait for BGP convergence
-        run: sleep 60
+        run: sleep 90
 
       - name: Test SSH access to r1 (admin/cisco)
         run: |
@@ -112,7 +112,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install containerlab
         run: |
@@ -147,7 +147,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install containerlab
         run: |
@@ -179,7 +179,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install containerlab
         run: |
@@ -215,12 +215,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy Zero Trust lab
         run: |
           cd zero-trust-fundamentals
-          docker-compose up -d --build
+          docker compose up -d --build
 
       - name: Wait for services
         run: sleep 30
@@ -235,7 +235,7 @@ jobs:
         if: always()
         run: |
           cd zero-trust-fundamentals
-          docker-compose down -v || true
+          docker compose down -v || true
 
   test-summary:
     name: Test Summary

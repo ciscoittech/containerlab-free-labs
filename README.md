@@ -1,7 +1,7 @@
 # Free Containerlab Network Labs 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Labs](https://img.shields.io/badge/labs-3-blue.svg)](.)
+[![Labs](https://img.shields.io/badge/labs-6-blue.svg)](.)
 [![Containerlab](https://img.shields.io/badge/containerlab-latest-green.svg)](https://containerlab.dev/)
 [![CI](https://github.com/ciscoittech/containerlab-free-labs/workflows/Validate%20Labs/badge.svg)](https://github.com/ciscoittech/containerlab-free-labs/actions)
 
@@ -27,6 +27,9 @@ Traditional network labs (GNS3, EVE-NG) require heavy virtual machines and compl
 | [**OSPF Basics**](ospf-basics/) | ⭐⭐ Beginner | 45 min | OSPF single-area, neighbor adjacency, DR/BDR election | 6 |
 | [**BGP eBGP Basics**](bgp-ebgp-basics/) | ⭐⭐ Beginner | 60 min | eBGP peering, AS-path, route advertisement | 6 |
 | [**Linux Network Namespaces**](linux-network-namespaces/) | ⭐ Beginner | 30 min | Network namespaces, veth pairs, IP forwarding | 5 |
+| [**VyOS Firewall Basics**](vyos-firewall-basics/) | ⭐⭐ Beginner | 45 min | Zone-based firewall, NAT, traffic filtering | 5 |
+| [**Enterprise VPN Migration**](enterprise-vpn-migration/) | ⭐⭐⭐ Advanced | 90 min | GRE tunnels, OSPF+BGP, site-to-site VPN, migration runbook | 22 |
+| [**Zero Trust Fundamentals**](zero-trust-fundamentals/) | ⭐⭐ Intermediate | 45 min | JWT auth, microservices, identity-based access control | 5 |
 
 ### 1. OSPF Basics
 Learn OSPF fundamentals with a simple 3-router topology. Perfect for understanding OSPF operation, DR/BDR election, and basic troubleshooting.
@@ -42,6 +45,21 @@ Understand external BGP with a 4-router, 3-AS topology. Learn BGP neighbor estab
 Explore how containerlab uses Linux network namespaces to create isolated network environments. Understand the foundation of container networking.
 
 [**→ Start Linux Namespaces Lab**](linux-network-namespaces/)
+
+### 4. VyOS Firewall Basics
+Configure zone-based firewall policies using VyOS. Learn traffic filtering, NAT, and network segmentation fundamentals.
+
+[**→ Start VyOS Firewall Lab**](vyos-firewall-basics/)
+
+### 5. Enterprise VPN Migration
+Tackle a real-world scenario: migrate a site-to-site GRE VPN between two offices with minimal downtime. Includes 16 containers across 2 sites with OSPF, BGP, firewalls, and application services.
+
+[**→ Start Enterprise VPN Lab**](enterprise-vpn-migration/)
+
+### 6. Zero Trust Fundamentals
+Build and explore a zero-trust microservices architecture with JWT authentication, identity verification, and protected API endpoints.
+
+[**→ Start Zero Trust Lab**](zero-trust-fundamentals/)
 
 ## ✨ SSH Access to Routers
 
@@ -115,6 +133,9 @@ sudo containerlab destroy -t topology.clab.yml
 1. **Start here**: Linux Network Namespaces (understand the foundation)
 2. **OSPF Basics**: Learn link-state routing protocols
 3. **BGP eBGP Basics**: Understand internet routing fundamentals
+4. **VyOS Firewall Basics**: Add security with zone-based firewalls
+5. **Zero Trust Fundamentals**: Explore identity-based access control
+6. **Enterprise VPN Migration**: Put it all together in a real-world scenario
 
 ## 🤝 Contributing
 

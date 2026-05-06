@@ -91,7 +91,11 @@ ENTRYPOINT
 chmod +x entrypoint.sh
 
 echo "Building frr-ssh:latest image..."
-docker buildx build --platform linux/amd64 --load -t frr-ssh:latest .
+if docker buildx version >/dev/null 2>&1; then
+    docker buildx build --platform linux/amd64 --load -t frr-ssh:latest .
+else
+    docker build -t frr-ssh:latest .
+fi
 
 echo ""
 echo "✅ frr-ssh:latest image built successfully!"
