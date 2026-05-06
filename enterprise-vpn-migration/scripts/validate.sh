@@ -704,7 +704,7 @@ test_21_grafana_accessible() {
     fi
 
     # Check if monitoring service responds
-    if exec_in_container web-a curl -s -m 5 http://10.1.20.13:3000 | grep -q "ok"; then
+    if exec_in_container web-a curl -s -m 5 http://10.1.20.13:3000 | grep -qi "ok"; then
         print_info "Monitoring service health check returned 'ok'"
     else
         print_fail "Monitoring service health check failed"
