@@ -42,7 +42,7 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.10)
         - ip addr add 203.0.113.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+        - sh -c 'ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255'
         - ip addr add 172.16.0.1/30 dev gre0
         - ip link set gre0 up
         - ip link set gre0 mtu 1400
@@ -72,11 +72,12 @@ topology:
         - ./configs/router-a2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a2/daemons:/etc/frr/daemons:ro
 
-    # Firewall-A (Zone-based firewall with VyOS)
+    # Firewall-A (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-a:
       kind: linux
-      image: ghcr.io/sever-sever/vyos-container:latest
+      image: alpine:3.18
       exec:
+        - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
         - ip addr add 10.1.20.2/24 dev eth1
         - ip addr add 10.1.20.3/24 dev eth2  # Web-A segment
@@ -84,7 +85,6 @@ topology:
         - ip addr add 10.1.20.5/24 dev eth4  # LDAP-A segment
         - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
         - ip route add default via 10.1.20.1
-        - sysctl -w net.ipv4.ip_forward=1
 
     # Web-A (nginx web server)
     web-a:
@@ -169,7 +169,7 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.20)
         - ip addr add 198.51.100.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+        - sh -c 'ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255'
         - ip addr add 172.16.0.2/30 dev gre0
         - ip link set gre0 up
         - ip link set gre0 mtu 1400
@@ -199,17 +199,17 @@ topology:
         - ./configs/router-b2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b2/daemons:/etc/frr/daemons:ro
 
-    # Firewall-B (Zone-based firewall with VyOS)
+    # Firewall-B (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-b:
       kind: linux
-      image: ghcr.io/sever-sever/vyos-container:latest
+      image: alpine:3.18
       exec:
+        - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
         - ip addr add 10.2.20.2/24 dev eth1
         - ip addr add 10.2.20.3/24 dev eth2  # Web-B segment
         - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
         - ip route add default via 10.2.20.1
-        - sysctl -w net.ipv4.ip_forward=1
 
     # Web-B (nginx web server)
     web-b:
