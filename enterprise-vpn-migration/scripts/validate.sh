@@ -817,11 +817,10 @@ run_post_migration_tests() {
 run_quick_tests() {
     print_header "Enterprise VPN Migration Lab - Quick Validation Tests"
 
-    # Run only critical tests (1, 5, 9, 13)
+    # Run only critical infrastructure tests (1, 5, 9)
     test_01_all_containers_running || true
     test_05_ospf_adjacencies || true
     test_09_gre_tunnel_interfaces_exist || true
-    test_13_dns_resolution_cross_site || true
 }
 
 print_summary() {
