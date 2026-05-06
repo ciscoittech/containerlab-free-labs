@@ -42,10 +42,10 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.10)
         - ip addr add 203.0.113.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - sh -c 'ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255'
-        - ip addr add 172.16.0.1/30 dev gre0
-        - ip link set gre0 up
-        - ip link set gre0 mtu 1400
+        - ip tunnel add gre1 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+        - ip addr add 172.16.0.1/30 dev gre1
+        - ip link set gre1 up
+        - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.10/24 dev eth3
       binds:
@@ -169,10 +169,10 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.20)
         - ip addr add 198.51.100.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - sh -c 'ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255'
-        - ip addr add 172.16.0.2/30 dev gre0
-        - ip link set gre0 up
-        - ip link set gre0 mtu 1400
+        - ip tunnel add gre1 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+        - ip addr add 172.16.0.2/30 dev gre1
+        - ip link set gre1 up
+        - ip link set gre1 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.20/24 dev eth3
       binds:

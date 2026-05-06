@@ -6,8 +6,8 @@
 # Purpose: Rollback to pre-migration VPN configuration
 #
 # This script reverses the VPN migration and restores original configuration:
-#   - Removes new GRE tunnel (gre1 with new IPs)
-#   - Restores old GRE tunnel (gre0 with old IPs)
+#   - Removes new GRE tunnel (gre2 with new IPs)
+#   - Restores old GRE tunnel (gre1 with old IPs)
 #   - Removes new WAN IPs
 #   - Restores old WAN IPs
 #
@@ -48,30 +48,30 @@ echo ""
 echo -e "${BLUE}========== Phase 1: Remove New Tunnel from OSPF ==========${NC}"
 echo ""
 
-echo -e "${YELLOW}[1.1] Removing gre1 from OSPF on router-a1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" -c "interface gre1" -c "no ip ospf area 0" -c "end"
+echo -e "${YELLOW}[1.1] Removing gre2 from OSPF on router-a1...${NC}"
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" -c "interface gre2" -c "no ip ospf area 0" -c "end"
 echo -e "${GREEN}✓ Done${NC}"
 
-echo -e "${YELLOW}[1.2] Removing gre1 from OSPF on router-b1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-b1 vtysh -c "conf t" -c "interface gre1" -c "no ip ospf area 0" -c "end"
+echo -e "${YELLOW}[1.2] Removing gre2 from OSPF on router-b1...${NC}"
+docker exec clab-enterprise-vpn-migration-router-b1 vtysh -c "conf t" -c "interface gre2" -c "no ip ospf area 0" -c "end"
 echo -e "${GREEN}✓ Done${NC}"
 
 echo ""
 echo -e "${BLUE}========== Phase 2: Recreate Old GRE Tunnel ==========${NC}"
 echo ""
 
-echo -e "${YELLOW}[2.1] Recreating gre0 on router-a1 (old IPs)...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
-docker exec clab-enterprise-vpn-migration-router-a1 ip addr add 172.16.0.1/30 dev gre0
-docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre0 up
-docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre0 mtu 1400
+echo -e "${YELLOW}[2.1] Recreating gre1 on router-a1 (old IPs)...${NC}"
+docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel add gre1 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+docker exec clab-enterprise-vpn-migration-router-a1 ip addr add 172.16.0.1/30 dev gre1
+docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre1 up
+docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre1 mtu 1400
 echo -e "${GREEN}✓ Done${NC}"
 
-echo -e "${YELLOW}[2.2] Recreating gre0 on router-b1 (old IPs)...${NC}"
-docker exec clab-enterprise-vpn-migration-router-b1 ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
-docker exec clab-enterprise-vpn-migration-router-b1 ip addr add 172.16.0.2/30 dev gre0
-docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre0 up
-docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre0 mtu 1400
+echo -e "${YELLOW}[2.2] Recreating gre1 on router-b1 (old IPs)...${NC}"
+docker exec clab-enterprise-vpn-migration-router-b1 ip tunnel add gre1 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+docker exec clab-enterprise-vpn-migration-router-b1 ip addr add 172.16.0.2/30 dev gre1
+docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre1 up
+docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre1 mtu 1400
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[2.3] Testing old tunnel connectivity...${NC}"
@@ -82,12 +82,12 @@ echo ""
 echo -e "${BLUE}========== Phase 3: Restore OSPF on Old Tunnel ==========${NC}"
 echo ""
 
-echo -e "${YELLOW}[3.1] Adding gre0 to OSPF on router-a1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" -c "interface gre0" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "ip ospf cost 100" -c "end"
+echo -e "${YELLOW}[3.1] Adding gre1 to OSPF on router-a1...${NC}"
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" -c "interface gre1" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "ip ospf cost 100" -c "end"
 echo -e "${GREEN}✓ Done${NC}"
 
-echo -e "${YELLOW}[3.2] Adding gre0 to OSPF on router-b1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-b1 vtysh -c "conf t" -c "interface gre0" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "ip ospf cost 100" -c "end"
+echo -e "${YELLOW}[3.2] Adding gre1 to OSPF on router-b1...${NC}"
+docker exec clab-enterprise-vpn-migration-router-b1 vtysh -c "conf t" -c "interface gre1" -c "ip ospf area 0" -c "ip ospf network point-to-point" -c "ip ospf cost 100" -c "end"
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[3.3] Waiting 10 seconds for OSPF convergence...${NC}"
@@ -99,19 +99,19 @@ echo -e "${BLUE}========== Phase 4: Remove New Tunnel ==========${NC}"
 echo ""
 
 echo -e "${YELLOW}[4.1] Shutting down new tunnel on router-a1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre1 down 2>/dev/null || true
+docker exec clab-enterprise-vpn-migration-router-a1 ip link set gre2 down 2>/dev/null || true
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[4.2] Deleting new tunnel on router-a1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel del gre1 2>/dev/null || true
+docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel del gre2 2>/dev/null || true
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[4.3] Shutting down new tunnel on router-b1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre1 down 2>/dev/null || true
+docker exec clab-enterprise-vpn-migration-router-b1 ip link set gre2 down 2>/dev/null || true
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[4.4] Deleting new tunnel on router-b1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-b1 ip tunnel del gre1 2>/dev/null || true
+docker exec clab-enterprise-vpn-migration-router-b1 ip tunnel del gre2 2>/dev/null || true
 echo -e "${GREEN}✓ Done${NC}"
 
 echo ""
@@ -147,7 +147,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 ip addr show eth2 | grep "in
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[6.2] Verifying GRE tunnel on router-a1...${NC}"
-docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel show gre0 | sed 's/^/  /'
+docker exec clab-enterprise-vpn-migration-router-a1 ip tunnel show gre1 | sed 's/^/  /'
 echo -e "${GREEN}✓ Done${NC}"
 
 echo -e "${YELLOW}[6.3] Testing end-to-end connectivity (web-a to web-b)...${NC}"
@@ -166,8 +166,8 @@ echo -e "${BLUE}Rollback Summary:${NC}"
 echo "  VPN Configuration: Restored to original (old IPs)"
 echo "  Old WAN IPs: 203.0.113.10 ↔ 198.51.100.10 (active)"
 echo "  New WAN IPs: 192.0.2.10 ↔ 192.0.2.20 (removed)"
-echo "  Old Tunnel: gre0 with 172.16.0.1 ↔ 172.16.0.2 (active)"
-echo "  New Tunnel: gre1 (removed)"
+echo "  Old Tunnel: gre1 with 172.16.0.1 ↔ 172.16.0.2 (active)"
+echo "  New Tunnel: gre2 (removed)"
 echo "  Rollback Time: $ROLLBACK_DURATION seconds"
 echo ""
 

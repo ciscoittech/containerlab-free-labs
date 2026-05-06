@@ -383,31 +383,31 @@ test_09_gre_tunnel_interfaces_exist() {
     local tests_passed=0
     local tests_failed=0
 
-    # Check router-a1 has gre0 interface (GRE shows state UNKNOWN when up, check flags for UP)
-    if exec_in_container router-a1 ip link show gre0 2>/dev/null | grep -q "gre0"; then
-        if exec_in_container router-a1 ip link show gre0 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
-            print_info "router-a1 gre0 interface exists and is UP"
+    # Check router-a1 has gre1 interface (GRE shows state UNKNOWN when up, check flags for UP)
+    if exec_in_container router-a1 ip link show gre1 2>/dev/null | grep -q "gre1"; then
+        if exec_in_container router-a1 ip link show gre1 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
+            print_info "router-a1 gre1 interface exists and is UP"
             tests_passed=$((tests_passed + 1))
         else
-            print_fail "router-a1 gre0 exists but is DOWN"
+            print_fail "router-a1 gre1 exists but is DOWN"
             tests_failed=$((tests_failed + 1))
         fi
     else
-        print_fail "router-a1 gre0 interface does not exist"
+        print_fail "router-a1 gre1 interface does not exist"
         tests_failed=$((tests_failed + 1))
     fi
 
-    # Check router-b1 has gre0 interface (GRE shows state UNKNOWN when up, check flags for UP)
-    if exec_in_container router-b1 ip link show gre0 2>/dev/null | grep -q "gre0"; then
-        if exec_in_container router-b1 ip link show gre0 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
-            print_info "router-b1 gre0 interface exists and is UP"
+    # Check router-b1 has gre1 interface (GRE shows state UNKNOWN when up, check flags for UP)
+    if exec_in_container router-b1 ip link show gre1 2>/dev/null | grep -q "gre1"; then
+        if exec_in_container router-b1 ip link show gre1 | grep -qE "<.*UP.*>|state (UP|UNKNOWN)"; then
+            print_info "router-b1 gre1 interface exists and is UP"
             tests_passed=$((tests_passed + 1))
         else
-            print_fail "router-b1 gre0 exists but is DOWN"
+            print_fail "router-b1 gre1 exists but is DOWN"
             tests_failed=$((tests_failed + 1))
         fi
     else
-        print_fail "router-b1 gre0 interface does not exist"
+        print_fail "router-b1 gre1 interface does not exist"
         tests_failed=$((tests_failed + 1))
     fi
 
@@ -425,23 +425,23 @@ test_10_gre_tunnel_ip_addressing() {
     local tests_passed=0
     local tests_failed=0
 
-    # Check router-a1 gre0 has 172.16.0.1
-    if exec_in_container router-a1 ip addr show gre0 | grep -q "172.16.0.1"; then
-        print_info "router-a1 gre0 has correct IP (172.16.0.1/30)"
+    # Check router-a1 gre1 has 172.16.0.1
+    if exec_in_container router-a1 ip addr show gre1 | grep -q "172.16.0.1"; then
+        print_info "router-a1 gre1 has correct IP (172.16.0.1/30)"
         tests_passed=$((tests_passed + 1))
     else
-        print_fail "router-a1 gre0 does not have 172.16.0.1"
-        exec_in_container router-a1 ip addr show gre0
+        print_fail "router-a1 gre1 does not have 172.16.0.1"
+        exec_in_container router-a1 ip addr show gre1
         tests_failed=$((tests_failed + 1))
     fi
 
-    # Check router-b1 gre0 has 172.16.0.2
-    if exec_in_container router-b1 ip addr show gre0 | grep -q "172.16.0.2"; then
-        print_info "router-b1 gre0 has correct IP (172.16.0.2/30)"
+    # Check router-b1 gre1 has 172.16.0.2
+    if exec_in_container router-b1 ip addr show gre1 | grep -q "172.16.0.2"; then
+        print_info "router-b1 gre1 has correct IP (172.16.0.2/30)"
         tests_passed=$((tests_passed + 1))
     else
-        print_fail "router-b1 gre0 does not have 172.16.0.2"
-        exec_in_container router-b1 ip addr show gre0
+        print_fail "router-b1 gre1 does not have 172.16.0.2"
+        exec_in_container router-b1 ip addr show gre1
         tests_failed=$((tests_failed + 1))
     fi
 
@@ -637,23 +637,23 @@ test_19_gre_tunnel_using_new_ips() {
     local tests_passed=0
     local tests_failed=0
 
-    # Check router-a1 gre0 tunnel source is 192.0.2.10
-    if exec_in_container router-a1 ip tunnel show gre0 | grep -q "remote 192.0.2.20"; then
-        print_info "router-a1 gre0 tunnel destination is 192.0.2.20 (correct)"
+    # Check router-a1 gre1 tunnel source is 192.0.2.10
+    if exec_in_container router-a1 ip tunnel show gre1 | grep -q "remote 192.0.2.20"; then
+        print_info "router-a1 gre1 tunnel destination is 192.0.2.20 (correct)"
         tests_passed=$((tests_passed + 1))
     else
-        print_fail "router-a1 gre0 tunnel destination is not 192.0.2.20"
-        exec_in_container router-a1 ip tunnel show gre0
+        print_fail "router-a1 gre1 tunnel destination is not 192.0.2.20"
+        exec_in_container router-a1 ip tunnel show gre1
         tests_failed=$((tests_failed + 1))
     fi
 
-    # Check router-b1 gre0 tunnel source is 192.0.2.20
-    if exec_in_container router-b1 ip tunnel show gre0 | grep -q "remote 192.0.2.10"; then
-        print_info "router-b1 gre0 tunnel destination is 192.0.2.10 (correct)"
+    # Check router-b1 gre1 tunnel source is 192.0.2.20
+    if exec_in_container router-b1 ip tunnel show gre1 | grep -q "remote 192.0.2.10"; then
+        print_info "router-b1 gre1 tunnel destination is 192.0.2.10 (correct)"
         tests_passed=$((tests_passed + 1))
     else
-        print_fail "router-b1 gre0 tunnel destination is not 192.0.2.10"
-        exec_in_container router-b1 ip tunnel show gre0
+        print_fail "router-b1 gre1 tunnel destination is not 192.0.2.10"
+        exec_in_container router-b1 ip tunnel show gre1
         tests_failed=$((tests_failed + 1))
     fi
 
