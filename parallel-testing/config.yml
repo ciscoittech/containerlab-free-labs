@@ -1,0 +1,162 @@
+# Parallel Testing Configuration
+# Defines lab-specific settings for automated testing
+
+labs:
+  # OSPF Basics Lab
+  ospf-basics:
+    wait_time: 60
+    containers:
+      - r1
+      - r2
+      - r3
+    topology_file: topology.clab.yml
+    protocols:
+      - ospf
+    ssh_ports:
+      r1: 2221
+      r2: 2222
+      r3: 2223
+
+  # BGP eBGP Basics Lab
+  bgp-ebgp-basics:
+    wait_time: 60
+    containers:
+      - r1
+      - r2
+      - r3
+      - r4
+    topology_file: topology.clab.yml
+    protocols:
+      - bgp
+    ssh_ports:
+      r1: 2211
+      r2: 2212
+      r3: 2213
+      r4: 2214
+
+  # Linux Network Namespaces Lab
+  linux-network-namespaces:
+    wait_time: 30
+    containers:
+      - router
+      - host1
+      - host2
+      - host3
+    topology_file: topology.clab.yml
+    protocols:
+      - static
+    ssh_ports:
+      router: 2231
+
+  # VyOS Firewall Basics Lab
+  vyos-firewall-basics:
+    wait_time: 60
+    containers:
+      - fw1
+      - client1
+      - internet
+    topology_file: topology.clab.yml
+    protocols:
+      - static
+      - firewall
+    ssh_ports:
+      fw1: 2241
+
+  # Enterprise VPN Migration Lab
+  enterprise-vpn-migration:
+    wait_time: 90
+    containers:
+      # HQ routers
+      - hq-r1
+      - hq-r2
+      - hq-gw
+      # Branch routers
+      - branch1-r1
+      - branch2-r1
+      - branch3-r1
+      # Remote access
+      - remote-vpn-gw
+      # DC routers
+      - dc-r1
+      - dc-r2
+      - dc-gw
+      # Cloud gateway
+      - cloud-gw
+      # Management
+      - mgmt-server
+      # Test clients
+      - hq-client
+      - branch1-client
+      - branch2-client
+      - remote-client
+    topology_file: topology.clab.yml
+    protocols:
+      - ospf
+      - bgp
+      - ipsec
+      - gre
+    ssh_ports:
+      hq-r1: 2251
+      hq-r2: 2252
+      hq-gw: 2253
+      branch1-r1: 2254
+      branch2-r1: 2255
+      branch3-r1: 2256
+
+  # Zero Trust Fundamentals Lab
+  zero-trust-fundamentals:
+    wait_time: 30
+    containers:
+      - api-gateway
+      - auth-service
+      - backend-api
+    topology_file: topology.clab.yml
+    protocols:
+      - http
+      - tls
+    ports:
+      api-gateway: 8080
+      auth-service: 8081
+      backend-api: 8082
+
+# Global settings
+global:
+  default_wait_time: 60
+  max_parallel_labs: 4
+  result_output_dir: results
+  log_level: info
+
+  # Retry settings
+  retry:
+    max_attempts: 3
+    delay_seconds: 5
+
+  # Timeout settings
+  timeouts:
+    container_start: 120
+    protocol_convergence: 180
+    test_execution: 300
+
+# Test categories for selective execution
+test_categories:
+  quick:
+    - linux-network-namespaces
+    - zero-trust-fundamentals
+
+  routing:
+    - ospf-basics
+    - bgp-ebgp-basics
+
+  security:
+    - vyos-firewall-basics
+
+  advanced:
+    - enterprise-vpn-migration
+
+  all:
+    - ospf-basics
+    - bgp-ebgp-basics
+    - linux-network-namespaces
+    - vyos-firewall-basics
+    - enterprise-vpn-migration
+    - zero-trust-fundamentals

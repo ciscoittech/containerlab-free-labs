@@ -1,0 +1,56 @@
+{
+  "lab": "ospf-basics",
+  "timestamp": "2025-12-15T14:30:00Z",
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0
+  },
+  "exercises": [
+    {
+  "exercise": 1,
+  "name": "Verify OSPF Neighbors",
+  "status": "passed",
+  "expected": "2 neighbors in Full state",
+  "actual": "Found 2 neighbors in Full state",
+  "details": "r1 has correct OSPF adjacencies"
+}
+,
+    {
+  "exercise": 2,
+  "name": "View OSPF Routes",
+  "status": "passed",
+  "expected": "Routes to 10.0.2.0/24, 10.0.3.0/24, 192.168.100.1/32",
+  "actual": "Found 3 of 3 expected routes: 10.0.2.0/24 10.0.3.0/24 192.168.100.1/32",
+  "details": "All expected OSPF routes are present"
+}
+,
+    {
+  "exercise": 3,
+  "name": "View OSPF Database",
+  "status": "passed",
+  "expected": "3 Router LSAs (one per router)",
+  "actual": "Found 3 Router LSAs",
+  "details": "OSPF database has all router LSAs"
+}
+,
+    {
+  "exercise": 4,
+  "name": "Test Connectivity",
+  "status": "passed",
+  "expected": "Ping to 192.168.100.1 succeeds",
+  "actual": "Ping to 192.168.100.1 successful",
+  "details": "End-to-end connectivity verified"
+}
+,
+    {
+  "exercise": 5,
+  "name": "Verify OSPF Interface",
+  "status": "passed",
+  "expected": "OSPF enabled on eth1 with area 0.0.0.0",
+  "actual": "OSPF is enabled on eth1 in area 0.0.0.0",
+  "details": "Interface correctly configured for OSPF"
+}
+
+  ]
+}

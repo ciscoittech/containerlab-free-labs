@@ -23,8 +23,6 @@ topology:
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
         - ip route add default via 100.64.0.254
         - apk add --no-cache iptables tcpdump curl
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
     router-a1:
@@ -44,18 +42,15 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.10)
         - ip addr add 203.0.113.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
+        - ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 198.51.100.10 local 203.0.113.10 ttl 255
         - ip addr add 172.16.0.1/30 dev gre0
         - ip link set gre0 up
         - ip link set gre0 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.10/24 dev eth3
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-a1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a1/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-A2 (Core Router, OSPF)
     router-a2:
@@ -73,12 +68,9 @@ topology:
         - ip addr add 10.1.10.1/24 dev eth1
         # Configure server network gateway
         - ip addr add 10.1.20.1/24 dev eth2
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-a2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a2/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Firewall-A (Zone-based firewall with VyOS)
     firewall-a:
@@ -93,8 +85,6 @@ topology:
         - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
         - ip route add default via 10.1.20.1
         - sysctl -w net.ipv4.ip_forward=1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # Web-A (nginx web server)
     web-a:
@@ -107,8 +97,6 @@ topology:
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # DNS-A (dnsmasq DNS server)
     dns-a:
@@ -124,8 +112,6 @@ topology:
         - echo "address=/dns-a.site-a.local/10.1.20.11" >> /etc/dnsmasq.conf
         - echo "address=/ldap-a.site-a.local/10.1.20.12" >> /etc/dnsmasq.conf
         - dnsmasq --no-daemon --log-queries &
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # LDAP-A (OpenLDAP directory server)
     ldap-a:
@@ -139,9 +125,7 @@ topology:
         - mkdir -p /var/lib/openldap/openldap-data
         - chown ldap:ldap /var/lib/openldap/openldap-data
         # Note: Full LDAP config would be in production, simplified for lab
-        - netcat -l -p 389 &  # Simple listener for connectivity testing
-      binds:
-        - /etc/localtime:/etc/localtime:ro
+        - nc -l -p 389 &  # Simple listener for connectivity testing
 
     # Monitor-A (monitoring dashboard placeholder)
     monitor-a:
@@ -166,8 +150,6 @@ topology:
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
         - ip route add default via 100.64.0.254
         - apk add --no-cache iptables tcpdump curl
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
     router-b1:
@@ -187,18 +169,15 @@ topology:
         # Configure WAN IP (OLD - will be migrated to 192.0.2.20)
         - ip addr add 198.51.100.10/30 dev eth2
         # Configure GRE tunnel (will use OLD WAN IP initially)
-        - ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
+        - ip tunnel del gre0 2>/dev/null; ip tunnel add gre0 mode gre remote 203.0.113.10 local 198.51.100.10 ttl 255
         - ip addr add 172.16.0.2/30 dev gre0
         - ip link set gre0 up
         - ip link set gre0 mtu 1400
         # Configure BGP peering IP
         - ip addr add 100.64.0.20/24 dev eth3
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-b1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b1/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Router-B2 (Core Router, OSPF)
     router-b2:
@@ -216,12 +195,9 @@ topology:
         - ip addr add 10.2.10.1/24 dev eth1
         # Configure server network gateway
         - ip addr add 10.2.20.1/24 dev eth2
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/router-b2/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b2/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Firewall-B (Zone-based firewall with VyOS)
     firewall-b:
@@ -234,8 +210,6 @@ topology:
         - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
         - ip route add default via 10.2.20.1
         - sysctl -w net.ipv4.ip_forward=1
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # Web-B (nginx web server)
     web-b:
@@ -248,8 +222,6 @@ topology:
         - mkdir -p /run/nginx
         - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
         - nginx
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     # Server-B (general application server)
     server-b:
@@ -259,8 +231,6 @@ topology:
         - ip addr add 10.2.20.11/24 dev eth1
         - ip route add default via 10.2.20.4
         - apk add --no-cache curl bind-tools netcat-openbsd traceroute
-      binds:
-        - /etc/localtime:/etc/localtime:ro
 
     #########################################################################
     # Internet Backbone (Simulated ISP Core)
@@ -284,12 +254,9 @@ topology:
         # Configure BGP peering IPs
         - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
         - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
-        # Start FRR daemons
-        - /usr/lib/frr/frrinit.sh start
       binds:
         - ./configs/internet-core/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/internet-core/daemons:/etc/frr/daemons:ro
-        - /etc/localtime:/etc/localtime:ro
 
     # Netbox (IPAM placeholder — lightweight substitute for lab networking)
     netbox:

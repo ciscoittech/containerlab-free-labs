@@ -1,0 +1,90 @@
+{
+  "backend-guidelines": {
+    "type": "domain",
+    "enforcement": "suggest",
+    "priority": "high",
+    "promptTriggers": {
+      "keywords": [
+        "controller", "service", "repository", "API", "endpoint",
+        "backend", "server", "database", "migration", "model"
+      ],
+      "intentPatterns": [
+        "(create|add|build|implement).*?(controller|service|endpoint|route)",
+        "(how to|best practice).*?(backend|API)",
+        "(fix|debug|troubleshoot).*?(error|exception|validation)"
+      ]
+    },
+    "fileTriggers": {
+      "pathPatterns": [
+        "app/**/*.{ext}",
+        "src/**/*.{ext}",
+        "server/**/*.{ext}"
+      ]
+    }
+  },
+
+  "frontend-guidelines": {
+    "type": "domain",
+    "enforcement": "suggest",
+    "priority": "high",
+    "promptTriggers": {
+      "keywords": [
+        "component", "React", "Vue", "Svelte", "frontend", "UI", "page",
+        "TypeScript", "JavaScript", "CSS", "styling", "responsive"
+      ],
+      "intentPatterns": [
+        "(create|add|build|implement).*?(component|page|form|modal)",
+        "(how to|best practice).*?(React|frontend|Vue)",
+        "(style|design|layout).*?(component|page|responsive)"
+      ]
+    },
+    "fileTriggers": {
+      "pathPatterns": [
+        "components/**/*.{tsx,jsx,vue,svelte}",
+        "pages/**/*.{tsx,jsx,vue,svelte}",
+        "src/**/*.{tsx,jsx,vue,svelte}"
+      ]
+    }
+  },
+
+  "service-discovery": {
+    "type": "reference",
+    "enforcement": "suggest",
+    "priority": "medium",
+    "promptTriggers": {
+      "keywords": [
+        "service", "create service", "new feature",
+        "generate", "validation", "exist", "duplicate", "inventory"
+      ],
+      "intentPatterns": [
+        "(create|add|build|implement).*?service",
+        "(does|do we have|exists).*?(service|feature)",
+        "(check|see|what).*?(services|exists)"
+      ]
+    }
+  },
+
+  "test-guidelines": {
+    "type": "domain",
+    "enforcement": "suggest",
+    "priority": "high",
+    "promptTriggers": {
+      "keywords": [
+        "test", "testing", "unit test", "integration test", "e2e test",
+        "mock", "stub", "assertion", "coverage"
+      ],
+      "intentPatterns": [
+        "(write|create|add|build).*?test",
+        "(test|testing).*?(component|service|API|endpoint)",
+        "(mock|stub|spy).*?(dependencies|methods)"
+      ]
+    },
+    "fileTriggers": {
+      "pathPatterns": [
+        "tests/**/*",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "**/*.spec.{js,ts,jsx,tsx}"
+      ]
+    }
+  }
+}

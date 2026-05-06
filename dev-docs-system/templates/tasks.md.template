@@ -1,0 +1,189 @@
+# [Feature Name] - Task Checklist
+
+**Plan**: `[feature]-plan.md`
+**Context**: `[feature]-context.md`
+**Last Updated**: [Timestamp]
+
+---
+
+## Progress Overview
+
+**Total Completion**: X/Y tasks (Z%)
+
+**Phase 1**: X/Y tasks (Z%) - [Status]
+**Phase 2**: X/Y tasks (Z%) - [Status]
+**Phase 3**: X/Y tasks (Z%) - [Status]
+**Phase 4**: X/Y tasks (Z%) - [Status]
+
+---
+
+## Phase 1: [Phase Name] (X hours)
+
+**Goal**: [Phase objective]
+**Status**: [Not Started / In Progress / Complete]
+
+### Tasks
+
+[ ] **Task 1.1: [Description]** (X hrs)
+    - Subtask 1
+    - Subtask 2
+    - Dependencies: [None / Task X.Y]
+    - Status: [Not started]
+
+[ ] **Task 1.2: [Description]** (X hrs)
+    - Subtask 1
+    - Subtask 2
+    - Dependencies: Task 1.1
+    - Status: [Not started]
+
+[ ] **Task 1.3: [Description]** (X hrs)
+    - Subtask 1
+    - Dependencies: [None]
+    - Status: [Not started]
+
+---
+
+## Phase 2: [Phase Name] (X hours)
+
+**Goal**: [Phase objective]
+**Status**: [Not Started / In Progress / Complete]
+**Depends On**: Phase 1 complete
+
+### Tasks
+
+[ ] **Task 2.1: [Description]** (X hrs)
+    - Subtask 1
+    - Subtask 2
+    - Dependencies: Phase 1 complete
+    - Status: [Not started]
+
+[ ] **Task 2.2: [Description]** (X hrs)
+    - Subtask 1
+    - Dependencies: Task 2.1
+    - Status: [Not started]
+
+---
+
+## Phase 3: [Phase Name] (X hours)
+
+**Goal**: [Phase objective]
+**Status**: [Not Started / In Progress / Complete]
+**Depends On**: Phase 2 complete
+
+### Tasks
+
+[ ] **Task 3.1: [Description]** (X hrs)
+    - Subtask 1
+    - Subtask 2
+    - Dependencies: Phase 2 complete
+    - Status: [Not started]
+
+[ ] **Task 3.2: [Description]** (X hrs)
+    - Subtask 1
+    - Dependencies: Task 3.1
+    - Status: [Not started]
+
+---
+
+## Phase 4: [Phase Name] (X hours)
+
+**Goal**: [Phase objective]
+**Status**: [Not Started / In Progress / Complete]
+**Depends On**: Phase 3 complete
+
+### Tasks
+
+[ ] **Task 4.1: [Description]** (X hrs)
+    - Subtask 1
+    - Dependencies: Phase 3 complete
+    - Status: [Not started]
+
+[ ] **Task 4.2: [Description]** (X hrs)
+    - Subtask 1
+    - Dependencies: Task 4.1
+    - Status: [Not started]
+
+---
+
+## Task Completion Log
+
+### Completed Tasks
+
+**[Date Time]**: Task 1.1 - [Description]
+- Duration: X hours
+- Notes: [Any important notes]
+
+**[Date Time]**: Task 1.2 - [Description]
+- Duration: X hours
+- Notes: [Any important notes]
+
+---
+
+## Blocked Tasks
+
+**Task X.Y**: [Description]
+- Blocked By: [Blocker description]
+- Impact: [What's affected]
+- Action Needed: [What needs to happen]
+
+---
+
+## Added Tasks (Not in Original Plan)
+
+[ ] **NEW Task X.Y: [Description]** (X hrs)
+    - Reason Added: [Why this wasn't in original plan]
+    - Priority: [High/Medium/Low]
+    - Dependencies: [If any]
+
+---
+
+## Time Tracking
+
+**Estimated Total**: [X hours]
+**Actual Time Spent**: [Y hours]
+**Remaining**: [Z hours]
+**Variance**: [+/- hours, reason if significant]
+
+### By Phase
+- **Phase 1**: Estimated X hrs, Actual Y hrs
+- **Phase 2**: Estimated X hrs, Actual Y hrs
+- **Phase 3**: Estimated X hrs, Actual Y hrs
+- **Phase 4**: Estimated X hrs, Actual Y hrs
+
+---
+
+## How to Use This File
+
+### Marking Tasks Complete
+1. Change `[ ]` to `[x]` when task is done
+2. Add completion entry to "Task Completion Log"
+3. Update progress percentages at top
+4. Update context.md with any discoveries
+
+### Adding New Tasks
+1. Add to appropriate phase with [NEW] prefix
+2. Explain why it wasn't in original plan
+3. Update total hours estimate
+4. Check if it blocks other tasks
+
+### During Work Sessions
+1. Check next uncompleted task
+2. Review dependencies
+3. Work on task
+4. Mark complete when done
+5. Update "Last Updated" timestamp
+
+### End of Session
+1. Review what was completed
+2. Update progress tracking
+3. Note any blockers
+4. Run `/dev-docs-update` to preserve context
+
+---
+
+## Notes
+
+- Tasks should be marked complete IMMEDIATELY after finishing
+- Update context.md with discoveries during each task
+- If task takes significantly longer than estimated, note why
+- If task becomes unnecessary, strike through and explain why
