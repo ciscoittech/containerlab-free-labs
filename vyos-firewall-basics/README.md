@@ -236,6 +236,58 @@ docker ps | grep vyos-firewall-basics
 docker exec clab-vyos-firewall-basics-fw1 su - vyos -c "show firewall"
 ```
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "My VyOS firewall is blocking all traffic from LAN to WAN. Here's my zone config: [paste]"
+- "What's the difference between 'accept' and 'drop' default actions in VyOS zones?"
+- "How do I allow only HTTP and HTTPS from LAN to WAN on VyOS?"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Change Default Action
+
+**Break it:** On the VyOS firewall, set the LAN-to-WAN default action to `drop`
+
+```bash
+docker exec -it clab-vyos-firewall-basics-fw1 su - vyos
+configure
+set firewall name lan-wan default-action drop
+commit
+```
+
+**Symptom:** `docker exec clab-vyos-firewall-basics-client1 ping -c 3 172.16.10.100` fails — all LAN outbound traffic is blocked
+
+**Fix it:** Add specific rules to allow HTTP (port 80) and HTTPS (port 443) from LAN to WAN, then restore the original default-action
+
+**Verify:** `docker exec clab-vyos-firewall-basics-client1 ping -c 3 172.16.10.100` succeeds after restoring the policy
+
+### Exercise 2: Block ICMP
+
+**Break it:** On the VyOS firewall, add a rule to the lan-wan ruleset that drops ICMP before the default accept
+
+```bash
+configure
+set firewall name lan-wan rule 5 action drop
+set firewall name lan-wan rule 5 protocol icmp
+commit
+```
+
+**Symptom:** Ping from client1 to 172.16.10.100 fails, but HTTP traffic still works
+
+**Fix it:** Verify the ICMP block is working, then remove rule 5 to restore ping
+
+**Verify:** `show firewall statistics` shows rule 5 hit count increasing; after deletion, ping works again
+
+---
+
 ## Cleanup
 
 ```bash

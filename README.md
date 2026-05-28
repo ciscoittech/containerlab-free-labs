@@ -102,6 +102,20 @@ You can also connect via VS Code (right-click container, SSH) or Docker exec (`d
 
 ---
 
+## Practice with AI Assistance
+
+These labs work great with [Damira AI](https://damiraai.com) — a free AI assistant for network engineers. When you get stuck on any lab, Damira can help diagnose the issue:
+
+1. Sign up free at [damiraai.com](https://damiraai.com) (no credit card required)
+2. Paste your terminal output or describe what you're seeing
+3. Damira diagnoses the issue and walks you through the fix
+
+Each lab below includes example prompts you can try with Damira.
+
+> **Using GitHub Codespaces?** Damira is pre-installed — just add your free API key. See [DAMIRA_SETUP.md](DAMIRA_SETUP.md) for details.
+
+---
+
 ## Who This Is For
 
 - **CCNA / CCNP students** — practice routing protocols with Cisco-like CLI syntax

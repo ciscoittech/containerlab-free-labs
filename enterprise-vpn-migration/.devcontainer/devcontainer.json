@@ -26,7 +26,8 @@
         "ms-python.python",
         "streetsidesoftware.code-spell-checker",
         "yzhang.markdown-all-in-one",
-        "davidanson.vscode-markdownlint"
+        "davidanson.vscode-markdownlint",
+        "TerrenceBattlehunt.damira-assistant"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",

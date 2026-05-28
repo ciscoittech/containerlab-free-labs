@@ -278,6 +278,55 @@ show ip ospf interface
 show running-config
 ```
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "My OSPF neighbor is stuck in Init state. Here's my show ip ospf neighbor output: [paste]"
+- "R1 has a Full adjacency with R2 but R3 shows no OSPF neighbors. What should I check?"
+- "What's the difference between OSPF network types broadcast and point-to-point?"
+- "Why would an OSPF neighbor get stuck in Exstart?"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Remove Network Statement
+
+**Break it:** `docker exec -it clab-ospf-basics-r2 vtysh -c "conf t" -c "router ospf" -c "no network 10.0.12.0/24 area 0"`
+
+**Symptom:** r1 loses its OSPF adjacency with r2; the neighbor disappears from `show ip ospf neighbor`
+
+**Fix it:** Diagnose why r1 no longer sees r2 and restore the adjacency
+
+**Verify:** `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf neighbor"` shows r2 in Full state
+
+### Exercise 2: Change Area ID
+
+**Break it:** On r3, change the OSPF area from 0 to 1 on all interfaces
+
+**Symptom:** r3's adjacencies drop; r1 and r2 can no longer reach 192.168.100.0/24
+
+**Fix it:** Understand why mismatched area IDs prevent adjacency and correct the config
+
+**Verify:** `docker exec clab-ospf-basics-r1 vtysh -c "show ip route ospf"` shows 192.168.100.0/24
+
+### Exercise 3: Wrong Hello Timer
+
+**Break it:** `docker exec -it clab-ospf-basics-r1 vtysh -c "conf t" -c "interface eth1" -c "ip ospf hello-interval 5"`
+
+**Symptom:** The r1-r2 adjacency drops after the dead interval expires because hello/dead timers no longer match
+
+**Fix it:** Identify the timer mismatch and restore the default hello interval
+
+**Verify:** `docker exec clab-ospf-basics-r1 vtysh -c "show ip ospf neighbor"` shows r2 back in Full state
+
+---
+
 ## Cleanup
 
 ```bash

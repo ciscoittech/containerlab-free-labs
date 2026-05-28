@@ -343,6 +343,55 @@ BGP will **reject** any route where its own AS number appears in the AS-path. Th
 
 **Example**: r1 (AS 100) will reject routes with AS-path containing `100`.
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "My BGP peer is stuck in Active state between AS100 and AS200. What should I check?"
+- "I can see routes from AS100 but not from AS300. Here's my BGP table: [paste]"
+- "What does 'ebgp-requires-policy' mean in FRR and how do I fix it?"
+- "Explain AS-path loop prevention — why won't R4 accept routes with its own ASN?"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Wrong Remote AS
+
+**Break it:** On r2, change the neighbor r1 config to peer with AS 999 instead of AS 100
+
+**Symptom:** The r1-r2 session drops; r1 logs a notification error about AS mismatch
+
+**Fix it:** Identify the misconfigured remote-as and correct it on r2
+
+**Verify:** `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp summary"` shows r2 in Established state
+
+### Exercise 2: Missing Route Advertisement
+
+**Break it:** On r3, remove the `network 192.168.3.0/24` statement from the BGP config
+
+**Symptom:** r1's BGP table no longer contains 192.168.3.0/24; routes through AS 300 disappear
+
+**Fix it:** Identify which prefix stopped being advertised and add the network statement back
+
+**Verify:** `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp"` shows 192.168.3.0/24 with AS-path `200 300`
+
+### Exercise 3: Add eBGP Policy
+
+**Break it:** On r1, enable `bgp ebgp-requires-policy` under `router bgp 100`
+
+**Symptom:** All routes from r2 are rejected; r1's BGP table goes empty even though the session stays Established
+
+**Fix it:** Create a permissive route-map and apply it as an inbound policy on r1's peer to r2
+
+**Verify:** `docker exec clab-bgp-ebgp-basics-r1 vtysh -c "show ip bgp"` shows routes from AS 200 and AS 300
+
+---
+
 ## Cleanup
 
 ```bash

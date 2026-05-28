@@ -274,6 +274,44 @@ lsof -i :8080
 - Verify `Authorization: Bearer <token>` header format
 - Try getting fresh token with `/auth/login`
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "My JWT token is being rejected with 'invalid signature'. What should I check?"
+- "Explain the difference between authentication and authorization in zero trust"
+- "Why should tokens have short expiry times?"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Expire the Token
+
+**Break it:** Get a JWT token, then wait 5+ minutes (tokens expire after 5 minutes)
+
+**Symptom:** `curl http://localhost:8080/api/profile -H "Authorization: Bearer $TOKEN"` returns `401 Token expired`
+
+**Fix it:** Understand why the token was rejected and obtain a fresh one
+
+**Verify:** Re-authenticate with `POST /auth/login`, copy the new token, and confirm the profile endpoint returns 200
+
+### Exercise 2: Wrong Credentials
+
+**Break it:** `curl -X POST http://localhost:8443/auth/login -H "Content-Type: application/json" -d '{"username": "nobody", "password": "wrongpass"}'`
+
+**Symptom:** Login returns a 401 or error response — no token is issued
+
+**Fix it:** Observe the exact error response and understand why non-existent users are rejected at the identity layer rather than the application layer
+
+**Verify:** Login as `alice` with `password123` succeeds and returns a valid token
+
+---
+
 ## Cleanup
 
 ```bash

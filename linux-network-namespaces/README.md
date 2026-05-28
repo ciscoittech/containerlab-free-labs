@@ -306,6 +306,44 @@ docker exec <container> ip route show
 docker exec <router> sysctl -w net.ipv4.ip_forward=1
 ```
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "I set up IP forwarding on my Linux router but host1 still can't ping host3. Here's my routing table: [paste ip route output]"
+- "What's the difference between a veth pair and a bridge interface?"
+- "Why do I need IP forwarding enabled for routing between namespaces?"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Disable IP Forwarding
+
+**Break it:** `docker exec clab-netns-basics-router sysctl -w net.ipv4.ip_forward=0`
+
+**Symptom:** `docker exec clab-netns-basics-host1 ping -c 2 10.0.2.10` times out — host1 can no longer reach host3
+
+**Fix it:** Diagnose the issue and restore connectivity
+
+**Verify:** `docker exec clab-netns-basics-host1 ping -c 3 10.0.2.10` succeeds
+
+### Exercise 2: Remove a Route
+
+**Break it:** `docker exec clab-netns-basics-host3 ip route del 10.0.1.0/24`
+
+**Symptom:** host3 can no longer reach host1 or host2, but host1 can still reach host3 one-way
+
+**Fix it:** Identify which host lost its route and add it back
+
+**Verify:** `docker exec clab-netns-basics-host1 ping -c 3 10.0.2.10` and `docker exec clab-netns-basics-host3 ping -c 3 10.0.1.10` both succeed
+
+---
+
 ## Cleanup
 
 ```bash

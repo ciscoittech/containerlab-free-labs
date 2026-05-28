@@ -13,12 +13,13 @@
         "ms-vscode.vscode-yaml",
         "redhat.vscode-yaml",
         "ms-python.python",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "TerrenceBattlehunt.damira-assistant"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
-  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest && docker pull alpine:latest && bash /workspaces/containerlab-free-labs/build-frr-ssh.sh"
+  "postCreateCommand": "containerlab version && docker pull frrouting/frr:latest && docker pull alpine:latest && bash /workspaces/containerlab-free-labs/build-frr-ssh.sh && echo '' && echo '🤖 Damira AI is installed! Get your free API key:' && echo '   1. Sign up at https://damiraai.com (free, no credit card)' && echo '   2. Copy your API key from the dashboard' && echo '   3. VS Code Settings → search Damira → paste key' && echo '   4. Open the Damira chat panel and start asking questions' && echo ''"
 }

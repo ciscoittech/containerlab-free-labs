@@ -797,6 +797,69 @@ After completing this lab, you will be able to:
 - **dnsmasq**: DNS server
 - **OpenLDAP**: Directory service
 
+---
+
+## Try with Damira AI
+
+Stuck on this lab? [Damira AI](https://damiraai.com) can help. Try these prompts (free, no credit card):
+
+- "My GRE tunnel is up but OSPF routes aren't being exchanged over it. Here's my OSPF config: [paste]"
+- "How do I verify that traffic is actually going through the GRE tunnel and not the old path?"
+- "What's the rollback plan if the VPN migration fails?"
+- "Help me write a change control document for this VPN migration"
+
+---
+
+## Troubleshooting Exercises
+
+Practice diagnosing and fixing real issues:
+
+### Exercise 1: Break GRE Tunnel
+
+**Break it:** Change the tunnel destination IP on router-a1 to an incorrect address
+
+```bash
+docker exec -it clab-enterprise-vpn-migration-router-a1 bash
+ip tunnel change gre0 remote 192.0.2.99
+```
+
+**Symptom:** `docker exec clab-enterprise-vpn-migration-router-a1 ping 172.16.0.2` fails; OSPF routes over the tunnel disappear from the routing table
+
+**Fix it:** Identify the misconfigured tunnel endpoint and correct it to the valid remote IP
+
+**Verify:** `docker exec clab-enterprise-vpn-migration-router-a1 ping 172.16.0.2` succeeds; `show ip ospf neighbor` shows the tunnel neighbor back in Full state
+
+### Exercise 2: Remove OSPF Redistribution
+
+**Break it:** On router-a1, remove the OSPF network statement for the GRE tunnel interface
+
+```bash
+docker exec -it clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" -c "router ospf" -c "no network 172.16.0.0/30 area 0"
+```
+
+**Symptom:** Cross-site routes (10.2.0.0/16) disappear from router-a2's routing table; Site B services become unreachable from Site A
+
+**Fix it:** Identify which OSPF network statement is missing and restore it
+
+**Verify:** `docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip route ospf"` shows Site B subnets; `docker exec clab-enterprise-vpn-migration-web-a curl http://10.2.20.10` succeeds
+
+### Exercise 3: Simulate Rollback
+
+**Break it:** Run the migration script to apply new VPN IPs, then intentionally trigger a rollback scenario
+
+```bash
+./scripts/migrate-vpn.sh --auto
+./scripts/rollback.sh
+```
+
+**Symptom:** After rollback, old VPN IPs (203.0.113.10 / 198.51.100.10) should be restored and the new IPs removed
+
+**Fix it:** Verify the rollback completed cleanly — no partial state left behind
+
+**Verify:** `./scripts/validate.sh --pre-migration` passes all 16 baseline tests after rollback
+
+---
+
 ## Resources
 
 ### Lab Documentation
