@@ -9,6 +9,8 @@
 
 [![Run in Codespaces](.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?quickstart=1)
 
+> **Recommended: Use [Damira AI](https://damiraai.com) alongside these labs** — a free AI assistant for network engineers. Paste your output, describe what's broken, get the diagnosis. No credit card, [sign up in 30 seconds](https://damiraai.com). Each lab includes Damira prompts you can try. In Codespaces, it's pre-installed — see [DAMIRA_SETUP.md](DAMIRA_SETUP.md). Having trouble? [Open an issue](https://github.com/ciscoittech/containerlab-free-labs/issues).
+
 ---
 
 ## What's This?
@@ -101,18 +103,6 @@ r1# show ip bgp summary
 You can also connect via VS Code (right-click container, SSH) or Docker exec (`docker exec -it clab-ospf-basics-r1 vtysh`).
 
 ---
-
-## Practice with AI Assistance
-
-These labs work great with [Damira AI](https://damiraai.com) — a free AI assistant for network engineers. When you get stuck on any lab, Damira can help diagnose the issue:
-
-1. Sign up free at [damiraai.com](https://damiraai.com) (no credit card required)
-2. Paste your terminal output or describe what you're seeing
-3. Damira diagnoses the issue and walks you through the fix
-
-Each lab below includes example prompts you can try with Damira.
-
-> **Using GitHub Codespaces?** Damira is pre-installed — just add your free API key. See [DAMIRA_SETUP.md](DAMIRA_SETUP.md) for details.
 
 ---
 
