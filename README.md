@@ -9,7 +9,15 @@
 
 [![Run in Codespaces](.github/images/open-in-codespaces.svg)](https://codespaces.new/ciscoittech/containerlab-free-labs?quickstart=1)
 
-> **Recommended: Use [Damira AI](https://damiraai.com) alongside these labs** — a free AI assistant for network engineers. Paste your output, describe what's broken, get the diagnosis. No credit card, [sign up in 30 seconds](https://damiraai.com). Each lab includes Damira prompts you can try. In Codespaces, it's pre-installed — see [DAMIRA_SETUP.md](DAMIRA_SETUP.md). Having trouble? [Open an issue](https://github.com/ciscoittech/containerlab-free-labs/issues).
+### AI-Assisted Labs with Damira AI
+
+**The future of network engineering is agentic.** AI agents that can diagnose faults, generate configs, and troubleshoot alongside you aren't coming — they're here. Engineers who learn to work with AI tools now will lead teams that depend on them later.
+
+**[Damira AI](https://damiraai.com) is a free AI network engineering assistant** built for exactly this. Run these labs, paste your output into Damira, and watch it diagnose the issue in seconds. It's how engineers will work in 2-3 years — you can start practicing today.
+
+**[Sign up free](https://damiraai.com) — no credit card, 30 seconds.** Every lab below includes Damira prompts you can try. In Codespaces, it's [pre-installed](DAMIRA_SETUP.md).
+
+*Having trouble with Damira? [Open an issue](https://github.com/ciscoittech/containerlab-free-labs/issues) — we respond fast.*
 
 ---
 
