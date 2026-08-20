@@ -1,0 +1,86 @@
+name: VyOS Diagnostic (temporary)
+
+on:
+  push:
+    branches: [ fix/vyos-firewall ]
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    name: Can VyOS commit a firewall config in a container?
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install containerlab
+        run: bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Deploy VyOS lab
+        run: |
+          cd vyos-firewall-basics
+          sudo containerlab deploy -t topology.clab.yml
+
+      - name: Wait for VyOS to finish booting
+        run: |
+          C=clab-vyos-firewall-basics-fw1
+          for i in $(seq 1 60); do
+            if sudo docker exec $C cat /opt/vyatta/etc/version >/dev/null 2>&1; then
+              echo "booted after ${i}0s"; break
+            fi
+            sleep 10
+          done
+          sudo docker exec $C cat /opt/vyatta/etc/version
+
+      - name: Q1 — does the shipped config.boot load?
+        continue-on-error: true
+        run: |
+          C=clab-vyos-firewall-basics-fw1
+          cat > /tmp/load.sh <<'S'
+          #!/bin/vbash
+          source /opt/vyatta/etc/functions/script-template
+          configure
+          load /opt/vyatta/etc/config/config.boot
+          commit
+          exit
+          S
+          sudo docker cp /tmp/load.sh $C:/tmp/load.sh
+          sudo docker exec $C chmod +x /tmp/load.sh
+          sudo docker exec $C /tmp/load.sh 2>&1 | tail -25
+
+      - name: Q2 — does a NON-firewall commit work?
+        continue-on-error: true
+        run: |
+          C=clab-vyos-firewall-basics-fw1
+          printf '#!/bin/vbash\nsource /opt/vyatta/etc/functions/script-template\nconfigure\nset system host-name diagtest\ncommit\nexit\n' > /tmp/sys.sh
+          sudo docker cp /tmp/sys.sh $C:/tmp/sys.sh
+          sudo docker exec $C chmod +x /tmp/sys.sh
+          sudo docker exec $C /tmp/sys.sh 2>&1 | tail -8
+
+      - name: Q3 — does a MINIMAL firewall commit work?
+        continue-on-error: true
+        run: |
+          C=clab-vyos-firewall-basics-fw1
+          printf '#!/bin/vbash\nsource /opt/vyatta/etc/functions/script-template\nconfigure\nset firewall ipv4 name TEST default-action drop\ncommit\nexit\n' > /tmp/fw.sh
+          sudo docker cp /tmp/fw.sh $C:/tmp/fw.sh
+          sudo docker exec $C chmod +x /tmp/fw.sh
+          echo "--- attempting: set firewall ipv4 name TEST default-action drop ---"
+          sudo docker exec $C /tmp/fw.sh 2>&1 | tail -20
+
+      - name: Q4 — conntrack module + capability state
+        continue-on-error: true
+        run: |
+          C=clab-vyos-firewall-basics-fw1
+          echo "--- host: are conntrack helper modules loaded? ---"
+          lsmod | grep -E 'nf_conntrack' || echo "(none loaded on host)"
+          echo "--- host: module unload supported? ---"
+          grep CONFIG_MODULE_UNLOAD /boot/config-$(uname -r) || true
+          echo "--- container capabilities ---"
+          sudo docker inspect $C --format '{{.HostConfig.Privileged}} {{.HostConfig.CapAdd}}'
+          sudo docker exec $C sh -c 'grep CapEff /proc/self/status'
+
+      - name: Cleanup
+        if: always()
+        run: |
+          cd vyos-firewall-basics
+          sudo containerlab destroy -t topology.clab.yml || true
