@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7.0
+    image: mongo:7.0.14
     container_name: zt-mongodb
     networks:
       - internal

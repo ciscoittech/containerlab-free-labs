@@ -4,7 +4,7 @@ topology:
   nodes:
     fw1:
       kind: linux
-      image: ghcr.io/sever-sever/vyos-container:latest
+      image: ghcr.io/sever-sever/vyos-container@sha256:c79e39ef91ee15a884ebaaa624249bb6ec71eb2b1e27a49287ea3521aebe83c7
       binds:
         - configs/fw1.conf:/opt/vyatta/etc/config/config.boot:ro
       exec:
@@ -12,7 +12,7 @@ topology:
 
     client1:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 192.168.100.10/24 dev eth1
         - sh -c "ip route del default 2>/dev/null; ip route add default via 192.168.100.1"
@@ -20,7 +20,7 @@ topology:
 
     internet:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 172.16.10.100/24 dev eth1
         - ip route add 192.168.100.0/24 via 172.16.10.1

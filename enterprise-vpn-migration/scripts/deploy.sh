@@ -54,19 +54,16 @@ echo -e "${GREEN}✓ Ready to deploy${NC}"
 echo ""
 echo -e "${YELLOW}[3/5] Pulling container images (this may take a few minutes)...${NC}"
 echo -e "${BLUE}ℹ Pulling FRR routers (frrouting/frr:9.1.0)...${NC}"
-docker pull frrouting/frr:9.1.0 >/dev/null 2>&1 || echo "Warning: Could not pull FRR image"
+bash "$(git rev-parse --show-toplevel)/build-frr-ssh.sh" >/dev/null || echo "Warning: Could not build frr-ssh image"
 
 echo -e "${BLUE}ℹ Pulling Alpine Linux (alpine:3.18)...${NC}"
-docker pull alpine:3.18 >/dev/null 2>&1 || echo "Warning: Could not pull Alpine image"
+docker pull alpine:3.22 >/dev/null 2>&1 || echo "Warning: Could not pull Alpine image"
 
 echo -e "${BLUE}ℹ Pulling VyOS firewall (vyos/vyos:1.4-rolling-202310260023)...${NC}"
-docker pull vyos/vyos:1.4-rolling-202310260023 >/dev/null 2>&1 || echo "Warning: Could not pull VyOS image"
 
 echo -e "${BLUE}ℹ Pulling Grafana (grafana/grafana:latest)...${NC}"
-docker pull grafana/grafana:latest >/dev/null 2>&1 || echo "Warning: Could not pull Grafana image"
 
 echo -e "${BLUE}ℹ Pulling Netbox (netboxcommunity/netbox:latest)...${NC}"
-docker pull netboxcommunity/netbox:latest >/dev/null 2>&1 || echo "Warning: Could not pull Netbox image"
 
 echo -e "${GREEN}✓ Container images ready${NC}"
 

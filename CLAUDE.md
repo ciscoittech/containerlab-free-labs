@@ -59,7 +59,15 @@ Each lab follows this structure:
 
 ## Architecture
 
-- **frr-ssh image**: Custom FRR image built by `build-frr-ssh.sh` that adds SSH access with auto-login to vtysh (admin/cisco credentials)
+- **frr-ssh image**: Custom FRR image built by `build-frr-ssh.sh` on top of the pinned,
+  multi-arch `quay.io/frrouting/frr:10.4.4` (so labs run natively on both x86_64 and Apple Silicon).
+  It adds two accounts, both password `cisco`:
+  - `admin` — login shell is `/usr/local/bin/vtysh-shell`, so SSH lands straight in the router CLI.
+    The wrapper handles `-c`, which is what makes `ssh r1 "show ip ospf neighbor"` work as well as an
+    interactive login. Do **not** go back to putting `exec vtysh` in `~/.bash_profile`: sshd runs a
+    non-login, non-interactive shell for `ssh host "cmd"`, never sources it, and every scripted SSH
+    call silently hits bash instead.
+  - `labshell` — plain bash, for `scp`, VS Code Remote-SSH, and Linux-level work.
 - **Topology files**: YAML files defining nodes (routers) and links, with port mappings for SSH access
 - **Container naming**: `clab-<topology-name>-<node-name>` (e.g., `clab-ospf-basics-r1`)
 

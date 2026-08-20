@@ -17,7 +17,7 @@ topology:
     # ISP-A Gateway (simulated ISP edge for Site A)
     isp-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 100.64.0.1/24 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
@@ -77,7 +77,7 @@ topology:
     # Firewall-A (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
@@ -91,7 +91,7 @@ topology:
     # Web-A (nginx web server)
     web-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.1.20.10/24 dev eth1
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
@@ -103,7 +103,7 @@ topology:
     # DNS-A (dnsmasq DNS server)
     dns-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.1.20.11/24 dev eth1
         - apk add --no-cache dnsmasq bind-tools
@@ -118,7 +118,7 @@ topology:
     # LDAP-A (OpenLDAP directory server)
     ldap-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.1.20.12/24 dev eth1
         - apk add --no-cache openldap openldap-back-mdb openldap-clients netcat-openbsd
@@ -132,7 +132,7 @@ topology:
     # Monitor-A (monitoring dashboard placeholder)
     monitor-a:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.1.20.13/24 dev eth1
         - apk add --no-cache curl netcat-openbsd
@@ -146,7 +146,7 @@ topology:
     # ISP-B Gateway (simulated ISP edge for Site B)
     isp-b:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 100.64.0.2/24 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
@@ -206,7 +206,7 @@ topology:
     # Firewall-B (L3 forwarder — Alpine substitute for VyOS in lab)
     firewall-b:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - sysctl -w net.ipv4.ip_forward=1
         # Configure interfaces
@@ -218,7 +218,7 @@ topology:
     # Web-B (nginx web server)
     web-b:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.2.20.10/24 dev eth1
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
@@ -230,7 +230,7 @@ topology:
     # Server-B (general application server)
     server-b:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.2.20.11/24 dev eth1
         - apk add --no-cache curl bind-tools netcat-openbsd traceroute
@@ -267,7 +267,7 @@ topology:
     # Netbox (IPAM placeholder — lightweight substitute for lab networking)
     netbox:
       kind: linux
-      image: alpine:3.18
+      image: alpine:3.22
       exec:
         - ip addr add 10.1.20.14/24 dev eth1
         - apk add --no-cache curl netcat-openbsd
