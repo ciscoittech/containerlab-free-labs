@@ -36,23 +36,38 @@ jobs:
 
       - name: Attempt firewall commit
         run: |
-          printf '#!/bin/vbash\nsource /opt/vyatta/etc/functions/script-template\nconfigure\n%s\ncommit\nexit\n' \
-            "${{ matrix.c.syntax }}" > fw.sh
-          docker cp fw.sh vy:/tmp/fw.sh
-          docker exec vy chmod +x /tmp/fw.sh
+          set -uo pipefail
+          # Write the script via stdin — `docker cp` raced container boot last time
+          # and silently produced a "no such file" that scored as a failed commit.
+          docker exec -i vy sh -c 'cat > /tmp/fw.sh && chmod +x /tmp/fw.sh' <<SCRIPT
+          #!/bin/vbash
+          source /opt/vyatta/etc/functions/script-template
+          configure
+          ${{ matrix.c.syntax }}
+          commit
+          save
+          exit
+          SCRIPT
+          docker exec vy test -x /tmp/fw.sh || { echo "HARNESS ERROR: script not present"; exit 2; }
+
           echo "--- ${{ matrix.c.syntax }} ---"
-          if docker exec -t vy /tmp/fw.sh 2>&1 | tee out.txt; then :; fi
-          if grep -qE 'Commit failed|failed' out.txt; then
-            echo "RESULT: FIREWALL COMMIT FAILED"
+          docker exec -t vy /tmp/fw.sh 2>&1 | tee out.txt || true
+
+      - name: Adjudicate — is the rule actually in the running config?
+        run: |
+          # The only trustworthy signal. Do not grep the commit output for
+          # "failed": last run that scored a no-op commit as success.
+          echo "--- running config ---"
+          docker exec -t vy vbash -c \
+            'source /opt/vyatta/etc/functions/script-template; run show configuration commands' \
+            2>&1 | tee cfg.txt | head -40
+          echo "---"
+          if grep -q "firewall .*TEST" cfg.txt; then
+            echo "RESULT: firewall config COMMITTED AND PRESENT"
+          else
+            echo "RESULT: firewall config ABSENT — this image cannot hold a firewall config"
             exit 1
           fi
-          echo "RESULT: FIREWALL COMMIT SUCCEEDED"
-
-      - name: Confirm the rule is actually in the running config
-        run: |
-          docker exec -t vy vbash -c \
-            'source /opt/vyatta/etc/functions/script-template; run show configuration commands' 2>&1 \
-            | grep -i firewall || { echo "no firewall config present"; exit 1; }
 
       - name: Cleanup
         if: always()
