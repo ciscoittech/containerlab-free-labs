@@ -13,6 +13,7 @@ jobs:
   validate-ospf:
     name: OSPF Basics Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -36,15 +37,24 @@ jobs:
       - name: Wait for OSPF convergence
         run: sleep 60
 
-      - name: Test SSH access to r1 (admin/cisco)
+      - name: Verify documented SSH access to r1 (admin/cisco)
         run: |
-          echo "========================================="
-          echo "SSH Access Validation (admin/cisco)"
-          echo "========================================="
-          echo ""
-          echo "Testing SSH to r1 on port 2221..."
-          sshpass -p 'cisco' ssh -o StrictHostKeyChecking=no -p 2221 admin@localhost "show version" && echo "✓ SSH access working!" || echo "✗ SSH access failed"
-          echo ""
+          set -euo pipefail
+          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10"
+
+          # The path the README tells learners to use, scripted. This assertion
+          # previously ran with `|| echo` appended, so it reported failure and
+          # passed the job anyway.
+          echo "--> ssh -p 2221 admin@localhost \"show ip ospf neighbor\""
+          out=$(sshpass -p 'cisco' ssh $SSH_OPTS -p 2221 admin@localhost "show ip ospf neighbor")
+          echo "$out"
+          echo "$out" | grep -q 'Full'
+
+          # And interactively, which must land at the router CLI rather than a shell.
+          echo "--> interactive login lands at the router prompt"
+          printf 'exit\n' | script -qec \
+            "sshpass -p 'cisco' ssh $SSH_OPTS -p 2221 admin@localhost" /dev/null \
+            | grep -qE '^r1#'
 
       - name: Run validation tests
         run: |
@@ -61,6 +71,7 @@ jobs:
   validate-bgp:
     name: BGP eBGP Basics Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -84,15 +95,24 @@ jobs:
       - name: Wait for BGP convergence
         run: sleep 90
 
-      - name: Test SSH access to r1 (admin/cisco)
+      - name: Verify documented SSH access to r1 (admin/cisco)
         run: |
-          echo "========================================="
-          echo "SSH Access Validation (admin/cisco)"
-          echo "========================================="
-          echo ""
-          echo "Testing SSH to r1 on port 2211..."
-          sshpass -p 'cisco' ssh -o StrictHostKeyChecking=no -p 2211 admin@localhost "show version" && echo "✓ SSH access working!" || echo "✗ SSH access failed"
-          echo ""
+          set -euo pipefail
+          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10"
+
+          # The path the README tells learners to use, scripted. This assertion
+          # previously ran with `|| echo` appended, so it reported failure and
+          # passed the job anyway.
+          echo "--> ssh -p 2211 admin@localhost \"show ip bgp summary\""
+          out=$(sshpass -p 'cisco' ssh $SSH_OPTS -p 2211 admin@localhost "show ip bgp summary")
+          echo "$out"
+          echo "$out" | grep -q 'BGP router identifier'
+
+          # And interactively, which must land at the router CLI rather than a shell.
+          echo "--> interactive login lands at the router prompt"
+          printf 'exit\n' | script -qec \
+            "sshpass -p 'cisco' ssh $SSH_OPTS -p 2211 admin@localhost" /dev/null \
+            | grep -qE '^r1#'
 
       - name: Run validation tests
         run: |
@@ -109,6 +129,7 @@ jobs:
   validate-netns:
     name: Linux Network Namespaces Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -119,7 +140,7 @@ jobs:
           bash -c "$(curl -sL https://get.containerlab.dev)"
 
       - name: Pull Alpine image
-        run: docker pull alpine:latest
+        run: docker pull alpine:3.22
 
       - name: Deploy Linux Namespaces lab
         run: |
@@ -144,6 +165,7 @@ jobs:
   validate-vyos:
     name: VyOS Firewall Basics Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -176,6 +198,7 @@ jobs:
   validate-enterprise-vpn:
     name: Enterprise VPN Migration Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -212,6 +235,7 @@ jobs:
   validate-zero-trust:
     name: Zero Trust Fundamentals Lab
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code

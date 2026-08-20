@@ -1,107 +1,84 @@
 #!/bin/bash
-# Build frr-ssh image in GitHub Codespaces
+# Build the frr-ssh image used by the OSPF, BGP and enterprise-VPN labs.
+#
+# The image gives each FRR router an `admin` account that lands straight in the
+# router CLI over SSH, the way a real Cisco/Juniper box does.
+set -euo pipefail
 
-echo "Creating temporary build directory..."
-mkdir -p /tmp/frr-ssh-build
-cd /tmp/frr-ssh-build
+# Pinned, multi-arch (amd64 + arm64). docker.io/frrouting/frr is amd64-only,
+# which is why the labs could not run natively on Apple Silicon.
+FRR_BASE="${FRR_BASE:-quay.io/frrouting/frr:10.4.4}"
+IMAGE="${IMAGE:-frr-ssh:latest}"
 
-echo "Creating Dockerfile..."
-cat > Dockerfile << 'DOCKERFILE'
-# Custom FRR Image with SSH Support
-# Base image: FRRouting latest stable
-FROM frrouting/frr:latest
+BUILD_DIR="$(mktemp -d)"
+trap 'rm -rf "$BUILD_DIR"' EXIT
 
-# Install OpenSSH server and utilities (Alpine Linux uses apk)
+echo "Building $IMAGE from $FRR_BASE ..."
+
+cat > "$BUILD_DIR/Dockerfile" <<DOCKERFILE
+FROM ${FRR_BASE}
+
 RUN apk add --no-cache \
-    openssh \
-    openssh-server \
-    iproute2 \
-    iputils \
-    tcpdump \
-    vim \
-    nano \
-    sudo \
-    bash
+    openssh openssh-server iproute2 iputils tcpdump vim nano sudo bash
 
-# Create SSH directory
 RUN mkdir -p /var/run/sshd
 
-# Create admin user with password and bash shell
-RUN adduser -D -s /bin/bash admin && \
-    echo 'admin:cisco' | chpasswd && \
-    addgroup admin frrvty
+# Router CLI as a login shell.
+#
+# sshd runs the user's login shell as \`\$SHELL -c "<command>"\` for a remote
+# command, and bare for an interactive session. Handling both here is what makes
+#   ssh admin@r1                          -> lands at "r1#"
+#   ssh admin@r1 "show ip ospf neighbor"  -> returns parseable output
+# work. The old approach put \`exec vtysh\` in ~/.bash_profile, which sshd never
+# sources for a remote command, so every scripted SSH call hit bash instead.
+RUN printf '%s\n' \
+      '#!/bin/sh' \
+      '[ "\$1" = "-c" ] && { shift; exec sudo /usr/bin/vtysh -c "\$*"; }' \
+      'exec sudo /usr/bin/vtysh' \
+    > /usr/local/bin/vtysh-shell \
+ && chmod +x /usr/local/bin/vtysh-shell \
+ && echo /usr/local/bin/vtysh-shell >> /etc/shells
 
-# Allow admin user to access vtysh without password
-RUN echo 'admin ALL=(ALL) NOPASSWD: /usr/bin/vtysh' >> /etc/sudoers
+RUN adduser -D -s /usr/local/bin/vtysh-shell admin \
+ && echo 'admin:cisco' | chpasswd \
+ && addgroup admin frrvty \
+ && echo 'admin ALL=(ALL) NOPASSWD: /usr/bin/vtysh' >> /etc/sudoers
 
-# Configure SSH
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config && \
-    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
-    ssh-keygen -A
+# \`admin\` has no shell, so scp/sftp and VS Code Remote-SSH cannot use it.
+# \`labshell\` keeps that capability without weakening the router-CLI experience.
+RUN adduser -D -s /bin/bash labshell \
+ && echo 'labshell:cisco' | chpasswd \
+ && echo 'labshell ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-# Create vtysh wrapper for admin user
-RUN echo '#!/bin/bash' > /usr/local/bin/vtysh-admin && \
-    echo 'sudo /usr/bin/vtysh "$@"' >> /usr/local/bin/vtysh-admin && \
-    chmod +x /usr/local/bin/vtysh-admin
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
+ && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+ && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
+ && ssh-keygen -A
 
-# Ensure FRR config directory exists and has proper permissions
-RUN mkdir -p /etc/frr && \
-    touch /etc/frr/frr.conf && \
-    touch /etc/frr/daemons && \
-    chown -R frr:frr /etc/frr && \
-    chmod 640 /etc/frr/frr.conf && \
-    chmod 640 /etc/frr/daemons
+RUN mkdir -p /etc/frr \
+ && touch /etc/frr/frr.conf /etc/frr/daemons /etc/frr/vtysh.conf \
+ && chown -R frr:frr /etc/frr \
+ && chmod 640 /etc/frr/frr.conf /etc/frr/daemons \
+ && chmod 644 /etc/frr/vtysh.conf
 
-# Add vtysh to admin's PATH and auto-start vtysh on SSH login
-# Use .bash_profile for login shells (SSH) instead of .bashrc
-RUN echo 'alias vtysh="sudo /usr/bin/vtysh"' >> /home/admin/.bash_profile && \
-    echo 'export PATH=$PATH:/usr/local/bin' >> /home/admin/.bash_profile && \
-    echo '# Auto-start vtysh on SSH login (like real routers)' >> /home/admin/.bash_profile && \
-    echo 'exec sudo /usr/bin/vtysh' >> /home/admin/.bash_profile
-
-# Expose SSH port
 EXPOSE 22
 
-# Copy custom entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Use custom entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 DOCKERFILE
 
-echo "Creating entrypoint.sh..."
-cat > entrypoint.sh << 'ENTRYPOINT'
+cat > "$BUILD_DIR/entrypoint.sh" <<'ENTRYPOINT'
 #!/bin/bash
 set -e
-
-# Start SSH daemon
-echo "Starting SSH daemon..."
 /usr/sbin/sshd
-
-# Wait a moment for SSH to initialize
-sleep 1
-
-# Start FRR daemons (preserve original FRR behavior)
-echo "Starting FRR daemons..."
 exec /usr/lib/frr/docker-start
 ENTRYPOINT
+chmod +x "$BUILD_DIR/entrypoint.sh"
 
-chmod +x entrypoint.sh
+# No --platform: build for the host arch so the labs run natively on both
+# x86_64 CI runners and Apple Silicon.
+docker build -t "$IMAGE" "$BUILD_DIR"
 
-echo "Building frr-ssh:latest image..."
-if docker buildx version >/dev/null 2>&1; then
-    docker buildx build --platform linux/amd64 --load -t frr-ssh:latest .
-else
-    docker build -t frr-ssh:latest .
-fi
-
-echo ""
-echo "✅ frr-ssh:latest image built successfully!"
-echo ""
-echo "Cleanup..."
-cd /
-rm -rf /tmp/frr-ssh-build
-
-echo "✅ Ready to deploy labs!"
+echo
+echo "Built $IMAGE — ready to deploy labs."

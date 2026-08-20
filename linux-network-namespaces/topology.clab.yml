@@ -4,7 +4,7 @@ topology:
   nodes:
     host1:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 10.0.1.10/24 dev eth1
         - ip route add 10.0.2.0/24 via 10.0.1.1
@@ -12,7 +12,7 @@ topology:
 
     host2:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 10.0.3.20/24 dev eth1
         - ip route add 10.0.1.0/24 via 10.0.3.1
@@ -20,7 +20,7 @@ topology:
 
     router:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 10.0.1.1/24 dev eth1
         - ip addr add 10.0.2.1/24 dev eth2
@@ -29,7 +29,7 @@ topology:
 
     host3:
       kind: linux
-      image: alpine:latest
+      image: alpine:3.22
       exec:
         - ip addr add 10.0.2.10/24 dev eth1
         - ip route add 10.0.1.0/24 via 10.0.2.1

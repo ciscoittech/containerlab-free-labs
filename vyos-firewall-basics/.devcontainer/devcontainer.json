@@ -24,6 +24,6 @@
       }
     }
   },
-  "postCreateCommand": "containerlab version && docker pull ghcr.io/sever-sever/vyos-container:latest && docker pull alpine:latest",
+  "postCreateCommand": "containerlab version && docker pull ghcr.io/sever-sever/vyos-container@sha256:c79e39ef91ee15a884ebaaa624249bb6ec71eb2b1e27a49287ea3521aebe83c7 && docker pull alpine:3.22",
   "remoteUser": "vscode"
 }

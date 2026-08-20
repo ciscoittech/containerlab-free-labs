@@ -108,7 +108,21 @@ r1# show ip bgp summary
 
 **Credentials:** `admin` / `cisco`
 
-You can also connect via VS Code (right-click container, SSH) or Docker exec (`docker exec -it clab-ospf-basics-r1 vtysh`).
+Scripted access works the same way, which is what CI checks on every run:
+
+```bash
+ssh -p 2221 admin@localhost "show ip ospf neighbor"
+```
+
+**Need a Linux shell on the box** — `tcpdump`, editing files, `scp`, VS Code Remote-SSH?
+`admin` is the router CLI and has no shell, so use the `labshell` account instead:
+
+```bash
+ssh -p 2221 labshell@localhost     # password: cisco
+```
+
+Or go in directly with Docker: `docker exec -it clab-ospf-basics-r1 vtysh` (router CLI)
+or `docker exec -it clab-ospf-basics-r1 bash` (shell).
 
 ---
 
