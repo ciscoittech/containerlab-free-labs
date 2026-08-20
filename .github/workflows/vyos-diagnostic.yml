@@ -37,35 +37,36 @@ jobs:
       - name: Attempt firewall commit
         run: |
           set -uo pipefail
-          # Write the script via stdin — `docker cp` raced container boot last time
-          # and silently produced a "no such file" that scored as a failed commit.
-          docker exec -i vy sh -c 'cat > /tmp/fw.sh && chmod +x /tmp/fw.sh' <<SCRIPT
-          #!/bin/vbash
-          source /opt/vyatta/etc/functions/script-template
-          configure
-          ${{ matrix.c.syntax }}
-          commit
-          save
-          exit
-          SCRIPT
-          docker exec vy test -x /tmp/fw.sh || { echo "HARNESS ERROR: script not present"; exit 2; }
+          # No heredoc: an indented terminator inside a YAML block scalar does not
+          # close it, which silently produced an empty script on the last two runs.
+          printf '%s\n' \
+            '#!/bin/vbash' \
+            'source /opt/vyatta/etc/functions/script-template' \
+            'configure' \
+            '${{ matrix.c.syntax }}' \
+            'commit' \
+            'exit' > fw.sh
+          echo "--- script to run ---"; cat fw.sh
+          docker exec -i vy sh -c 'cat > /tmp/fw.sh; chmod +x /tmp/fw.sh' < fw.sh
+          docker exec vy test -s /tmp/fw.sh || { echo "HARNESS ERROR: script empty/missing"; exit 2; }
+          echo "--- as landed in container ---"; docker exec vy cat /tmp/fw.sh
 
-          echo "--- ${{ matrix.c.syntax }} ---"
+          echo "--- executing ---"
           docker exec -t vy /tmp/fw.sh 2>&1 | tee out.txt || true
 
       - name: Adjudicate — is the rule actually in the running config?
         run: |
-          # The only trustworthy signal. Do not grep the commit output for
-          # "failed": last run that scored a no-op commit as success.
-          echo "--- running config ---"
+          # The only trustworthy signal. Grepping the commit output for "failed"
+          # scored a silent no-op as success on an earlier run.
           docker exec -t vy vbash -c \
             'source /opt/vyatta/etc/functions/script-template; run show configuration commands' \
-            2>&1 | tee cfg.txt | head -40
-          echo "---"
-          if grep -q "firewall .*TEST" cfg.txt; then
-            echo "RESULT: firewall config COMMITTED AND PRESENT"
+            > cfg.txt 2>&1 || true
+          echo "--- firewall lines in running config ---"
+          grep -i firewall cfg.txt || echo "(none)"
+          if grep -qi "firewall.*TEST" cfg.txt; then
+            echo "RESULT: COMMITTED — this image CAN hold a firewall config"
           else
-            echo "RESULT: firewall config ABSENT — this image cannot hold a firewall config"
+            echo "RESULT: ABSENT — this image CANNOT hold a firewall config"
             exit 1
           fi
 
