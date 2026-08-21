@@ -1,6 +1,15 @@
 #!/bin/bash
 # Deploy VyOS Firewall Basics Lab
 
+# VyOS applies /run/sysctl/10-vyos-firewall.conf on every firewall commit, which
+# touches net.bridge.bridge-nf-call-*. Those keys only exist once br_netfilter is
+# loaded on the HOST — without it the commit fails and the firewall silently does
+# nothing at all.
+if ! lsmod 2>/dev/null | grep -q br_netfilter; then
+    echo "Loading br_netfilter (required for VyOS firewall commits)..."
+    sudo modprobe br_netfilter || echo "WARNING: could not load br_netfilter — the firewall will not enforce"
+fi
+
 set -e
 
 echo "======================================"

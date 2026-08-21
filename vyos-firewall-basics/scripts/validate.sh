@@ -84,13 +84,37 @@ else
     test_fail "LAN → WAN blocked (should be allowed)"
 fi
 
-# Test 5: Return traffic works (WAN → LAN for established)
-test_header "Verify return traffic (WAN responds to LAN)"
+# Test 5: Default deny — unsolicited WAN → LAN must be DROPPED.
+# This is what README Exercise 2 promises ("Expected: Timeout"). The previous
+# version of this test asserted the opposite and passed when the firewall was
+# doing nothing at all.
+test_header "Verify default deny (unsolicited WAN → LAN blocked)"
 if docker exec clab-${TOPOLOGY}-internet ping -c 2 -W 3 192.168.100.10 > /dev/null 2>&1; then
-    echo "  ✓ Bidirectional routing works"
+    test_fail "WAN → LAN succeeded — the firewall is not enforcing default deny"
+else
+    echo "  ✓ Unsolicited WAN → LAN is dropped"
+    test_pass
+fi
+
+# Test 6: the zone-based firewall is actually loaded
+test_header "Verify zone-based firewall config is committed"
+FWCFG=$(docker exec clab-${TOPOLOGY}-fw1 /bin/bash -c "cli-shell-api showCfg" 2>/dev/null | tr -d '\r')
+if echo "$FWCFG" | grep -q "zone wan" && echo "$FWCFG" | grep -q "zone lan" && \
+   echo "$FWCFG" | grep -q "name WAN-LAN"; then
+    echo "  ✓ zones (wan/lan) and WAN-LAN ruleset present"
     test_pass
 else
-    test_fail "Return traffic blocked"
+    test_fail "zone-based firewall config did not load (check br_netfilter on the host)"
+fi
+
+# Test 7: stateful inspection — nftables rules are actually installed
+test_header "Verify nftables ruleset installed"
+NFT=$(docker exec clab-${TOPOLOGY}-fw1 nft list ruleset 2>/dev/null | grep -cE "chain|rule")
+if [ "${NFT:-0}" -gt 10 ]; then
+    echo "  ✓ nftables ruleset installed ($NFT rule/chain lines)"
+    test_pass
+else
+    test_fail "no meaningful nftables ruleset (found ${NFT:-0} lines)"
 fi
 
 # Summary

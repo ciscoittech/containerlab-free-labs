@@ -175,13 +175,18 @@ jobs:
         run: |
           bash -c "$(curl -sL https://get.containerlab.dev)"
 
+      - name: Load br_netfilter (required for VyOS firewall commits)
+        run: |
+          sudo modprobe br_netfilter
+          test -e /proc/sys/net/bridge/bridge-nf-call-iptables
+
       - name: Deploy VyOS Firewall lab
         run: |
           cd vyos-firewall-basics
           sudo containerlab deploy -t topology.clab.yml
 
       - name: Wait for VyOS initialization
-        run: sleep 60
+        run: sleep 90
 
       - name: Run validation tests
         run: |

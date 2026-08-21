@@ -34,7 +34,7 @@ r3 also has a "simulated LAN": 192.168.100.0/24
 |--------|-----------|------------|
 | r1     | 1.1.1.1   | eth1: 10.0.1.1/24, eth2: 10.0.2.1/24 |
 | r2     | 2.2.2.2   | eth1: 10.0.1.2/24, eth2: 10.0.3.2/24 |
-| r3     | 3.3.3.3   | eth1: 10.0.2.3/24, eth2: 10.0.3.3/24, eth3: 192.168.100.1/24 |
+| r3     | 3.3.3.3   | eth1: 10.0.2.3/24, eth2: 10.0.3.3/24, lo: 192.168.100.1/32   |
 
 ## Quick Start
 
@@ -122,12 +122,6 @@ docker exec -it clab-ospf-basics-r1 bash
 | Check OSPF database | `vtysh -c "show ip ospf database"` |
 | View routing table | `vtysh -c "show ip route"` |
 | Show configuration | `vtysh -c "show run"` |
-
-**Why no SSH?**
-- ✅ Faster container startup (no SSH daemon)
-- ✅ Smaller container images (50MB vs 200MB+)
-- ✅ More secure (no SSH attack surface)
-- ✅ Standard practice for containerized labs
 
 ## Lab Exercises
 
