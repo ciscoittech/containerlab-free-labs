@@ -223,13 +223,13 @@ jobs:
           sudo containerlab deploy -t topology.clab.yml
 
       - name: Wait for convergence
-        run: sleep 90
+        run: sleep 120
 
-      - name: Run validation tests (quick mode)
+      - name: Run validation tests (full pre-migration suite)
         run: |
           cd enterprise-vpn-migration
           chmod +x scripts/validate.sh
-          sudo bash scripts/validate.sh --quick
+          sudo bash scripts/validate.sh --pre-migration
 
       - name: Cleanup
         if: always()
