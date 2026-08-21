@@ -42,6 +42,20 @@ Internet (WAN)
 
 ## Prerequisites
 
+> **Host requirement: `br_netfilter` must be loaded.**
+> ```bash
+> sudo modprobe br_netfilter
+> ```
+> VyOS applies `/run/sysctl/10-vyos-firewall.conf` on every firewall commit, and that
+> file sets `net.bridge.bridge-nf-call-*`. Those keys only exist once `br_netfilter` is
+> loaded on the **host**. Without it the commit fails, the config never loads, and the
+> firewall silently permits everything — the exercises below will not behave as written.
+> `scripts/deploy.sh` loads it for you.
+>
+> This also means the lab needs a **real Linux host** (or a Linux VM). It does not work
+> in environments where you cannot load host kernel modules.
+
+
 - **Containerlab** installed
 - **Docker** running
 - VyOS image: `ghcr.io/sever-sever/vyos-container:latest`
