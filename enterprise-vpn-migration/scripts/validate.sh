@@ -311,7 +311,7 @@ test_06_bgp_peering_established() {
     local tests_failed=0
 
     # Check router-a1 BGP session to internet-core
-    if exec_vtysh router-a1 "show bgp summary" | grep -q "Established"; then
+    if exec_vtysh router-a1 "show bgp neighbor" | grep -q "BGP state = Established"; then
         print_info "router-a1 BGP session to internet-core is ESTABLISHED"
         tests_passed=$((tests_passed + 1))
     else
@@ -321,7 +321,7 @@ test_06_bgp_peering_established() {
     fi
 
     # Check router-b1 BGP session to internet-core
-    if exec_vtysh router-b1 "show bgp summary" | grep -q "Established"; then
+    if exec_vtysh router-b1 "show bgp neighbor" | grep -q "BGP state = Established"; then
         print_info "router-b1 BGP session to internet-core is ESTABLISHED"
         tests_passed=$((tests_passed + 1))
     else

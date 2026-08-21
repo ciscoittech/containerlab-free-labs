@@ -20,10 +20,10 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
-        - ip addr add 100.64.0.1/24 dev eth2
+        - ip addr add 100.64.1.1/30 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
         - apk add --no-cache iptables tcpdump curl
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.1.2'"
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
     router-a1:
@@ -48,7 +48,7 @@ topology:
         - ip link set gre1 up
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
-        - ip addr add 100.64.0.10/24 dev eth3
+        - ip addr add 100.64.3.1/30 dev eth3
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
@@ -149,10 +149,10 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
-        - ip addr add 100.64.0.2/24 dev eth2
+        - ip addr add 100.64.2.1/30 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
         - apk add --no-cache iptables tcpdump curl
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.2.2'"
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
     router-b1:
@@ -177,7 +177,7 @@ topology:
         - ip link set gre1 up
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
-        - ip addr add 100.64.0.20/24 dev eth3
+        - ip addr add 100.64.4.1/30 dev eth3
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
@@ -254,11 +254,11 @@ topology:
       exec:
         - sysctl -w net.ipv4.ip_forward=1
         # Configure ISP backbone network
-        - ip addr add 100.64.0.254/24 dev eth1
-        - ip addr add 100.64.0.253/24 dev eth2
+        - ip addr add 100.64.1.2/30 dev eth1
+        - ip addr add 100.64.2.2/30 dev eth2
         # Configure BGP peering IPs
-        - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
-        - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
+        - ip addr add 100.64.3.2/30 dev eth3  # Peering to router-a1
+        - ip addr add 100.64.4.2/30 dev eth4  # Peering to router-b1
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
