@@ -58,7 +58,7 @@ Create a table in the format below:
 |--------|------|-----------|------------|-------------|---------|-------|
 | router-a1 | Edge Router | eth1 | 10.0.12.1 | /30 | N/A | OSPF to router-a2 |
 | router-a1 | Edge Router | eth2 | 203.0.113.10 | /30 | 203.0.113.9 | WAN (old) |
-| router-a1 | Edge Router | eth3 | 100.64.0.10 | /24 | N/A | BGP peering |
+| router-a1 | Edge Router | eth3 | 100.64.3.1 | /24 | N/A | BGP peering |
 | router-a1 | Edge Router | gre0 | 172.16.0.1 | /30 | N/A | VPN tunnel |
 | ... | ... | ... | ... | ... | ... | ... |
 
@@ -106,10 +106,10 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show ip ospf datab
 
 | Router | Local AS | Neighbor IP | Remote AS | State | Prefixes Received |
 |--------|----------|-------------|-----------|-------|-------------------|
-| router-a1 | 64512 | 100.64.0.100 | 65000 | Established | 2 |
-| router-b1 | 64513 | 100.64.0.101 | 65000 | Established | 2 |
-| internet-core | 65000 | 100.64.0.10 | 64512 | Established | 1 |
-| internet-core | 65000 | 100.64.0.20 | 64513 | Established | 1 |
+| router-a1 | 64512 | 100.64.3.2 | 65000 | Established | 2 |
+| router-b1 | 64513 | 100.64.4.2 | 65000 | Established | 2 |
+| internet-core | 65000 | 100.64.3.1 | 64512 | Established | 1 |
+| internet-core | 65000 | 100.64.4.1 | 64513 | Established | 1 |
 
 ---
 

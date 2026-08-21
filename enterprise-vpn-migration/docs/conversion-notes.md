@@ -160,9 +160,12 @@ NEW IP RANGES (migration target):
 
 **Internet Backbone**:
 ```
-100.64.0.0/24     ISP Core Network (simulated internet)
-  .1              ISP-A gateway (simulated upstream ISP)
-  .2              ISP-B gateway (simulated upstream ISP)
+100.64.0.0/16     ISP Core Network (simulated internet)
+                  One /30 per point-to-point link, so each link is its own subnet:
+  100.64.1.0/30     isp-a      .1 <-> internet-core .2
+  100.64.2.0/30     isp-b      .1 <-> internet-core .2
+  100.64.3.0/30     router-a1  .1 <-> internet-core .2
+  100.64.4.0/30     router-b1  .1 <-> internet-core .2
   .254            internet-core (FRR router simulating ISP backbone)
 ```
 
