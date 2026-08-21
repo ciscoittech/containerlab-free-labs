@@ -71,3 +71,7 @@ echo -e "${BLUE}ℹ Network resources have been cleaned up${NC}"
 echo ""
 echo "To redeploy the lab, run: ${YELLOW}./scripts/deploy.sh${NC}"
 echo ""
+
+# containerlab destroy can leave the management network behind. A stale
+# network blocks the next lab from deploying, so remove it explicitly.
+sudo docker network rm clab-vpn >/dev/null 2>&1 || true

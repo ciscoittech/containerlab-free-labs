@@ -1,5 +1,10 @@
 name: netns-basics
 
+mgmt:
+  network: clab-netns
+  ipv4-subnet: 172.20.21.0/24
+  ipv6-subnet: 3fff:172:20:21::/64
+
 topology:
   nodes:
     host1:

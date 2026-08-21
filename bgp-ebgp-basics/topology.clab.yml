@@ -1,9 +1,10 @@
 name: bgp-ebgp-basics
 
 mgmt:
-  network: clab-mgmt
-  ipv4-subnet: 172.20.20.0/24
-  ipv6-subnet: 3fff:172:20:20::/64
+  network: clab-bgp
+  ipv4-subnet: 172.20.23.0/24
+  ipv6-subnet: 3fff:172:20:23::/64
+
 
 topology:
   defaults:

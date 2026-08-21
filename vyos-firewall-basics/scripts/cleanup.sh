@@ -23,3 +23,7 @@ echo "======================================"
 echo ""
 echo "To redeploy: ./scripts/deploy.sh"
 echo ""
+
+# containerlab destroy can leave the management network behind. A stale
+# network blocks the next lab from deploying, so remove it explicitly.
+sudo docker network rm clab-vyos >/dev/null 2>&1 || true

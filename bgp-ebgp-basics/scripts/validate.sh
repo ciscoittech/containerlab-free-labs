@@ -1,5 +1,24 @@
 #!/bin/bash
 
+
+# --- PREFLIGHT -------------------------------------------------------------
+# If the containers are not there the deploy failed. Without this check every
+# assertion below fails on a missing container and the output looks like a
+# routing bug rather than a deploy failure.
+MISSING=""
+for n in r1 r2 r3 r4; do
+    docker inspect "clab-bgp-ebgp-basics-$n" >/dev/null 2>&1 || MISSING="$MISSING clab-bgp-ebgp-basics-$n"
+done
+if [ -n "$MISSING" ]; then
+    echo "✗ PREFLIGHT FAILED - lab is not deployed. Missing container(s):$MISSING"
+    echo ""
+    echo "  Deploy it first:  containerlab deploy -t topology.clab.yml"
+    echo "  If deploy failed with a subnet conflict, a previous lab left its"
+    echo "  network behind:   sudo docker network rm clab-netns clab-ospf clab-bgp clab-vyos clab-vpn"
+    exit 1
+fi
+
+
 echo "========================================="
 echo "BGP eBGP Basics Lab - Validation Tests"
 echo "========================================="
