@@ -1,8 +1,9 @@
 name: enterprise-vpn-migration
 
 mgmt:
-  network: vpn-mgmt
-  ipv4-subnet: 172.20.20.0/24
+  network: clab-vpn
+  ipv4-subnet: 172.20.25.0/24
+
 
 topology:
   defaults:
@@ -49,7 +50,7 @@ topology:
         # Configure BGP peering IP
         - ip addr add 100.64.0.10/24 dev eth3
         # Remove mgmt default route so FRR routing takes over
-        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
+        - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
         - ./configs/router-a1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-a1/daemons:/etc/frr/daemons:ro
@@ -178,7 +179,7 @@ topology:
         # Configure BGP peering IP
         - ip addr add 100.64.0.20/24 dev eth3
         # Remove mgmt default route so FRR routing takes over
-        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
+        - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
         - ./configs/router-b1/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/router-b1/daemons:/etc/frr/daemons:ro
@@ -259,7 +260,7 @@ topology:
         - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
         - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
         # Remove mgmt default route so FRR routing takes over
-        - "sh -c 'ip route del default via 172.20.20.1 2>/dev/null; true'"
+        - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
         - ./configs/internet-core/frr.conf:/etc/frr/frr.conf:ro
         - ./configs/internet-core/daemons:/etc/frr/daemons:ro

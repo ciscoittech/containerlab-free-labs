@@ -369,7 +369,7 @@ Management:  router-b2 (10.2.10.0/24)
 **Stage 1: Container Creation** (parallel, ~10 seconds):
 - All 16 containers created simultaneously
 - Base images pulled from registries
-- Management network (172.20.20.0/24) assigned
+- Management network (172.20.25.0/24) assigned
 
 **Stage 2: Network Links** (sequential, ~5 seconds):
 - 24 point-to-point veth pairs created

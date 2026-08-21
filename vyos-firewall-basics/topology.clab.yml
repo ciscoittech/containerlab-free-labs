@@ -1,5 +1,10 @@
 name: vyos-firewall-basics
 
+mgmt:
+  network: clab-vyos
+  ipv4-subnet: 172.20.24.0/24
+  ipv6-subnet: 3fff:172:20:24::/64
+
 topology:
   nodes:
     fw1:
