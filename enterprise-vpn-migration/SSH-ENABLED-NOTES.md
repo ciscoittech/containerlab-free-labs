@@ -72,7 +72,7 @@ ssh -p 2235 admin@localhost
 
 admin@internet-core$ vtysh
 internet-core# show ip bgp summary
-internet-core# show ip bgp neighbors 100.64.0.10 advertised-routes
+internet-core# show ip bgp neighbors 100.64.3.1 advertised-routes
 ```
 
 ---

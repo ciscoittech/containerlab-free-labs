@@ -58,7 +58,7 @@ Your ISP, **MegaNet Communications**, is undergoing a network restructure and ha
 ```
     [Internet]
         |
-    [ISP-A Gateway] (100.64.0.1)
+    [ISP-A Gateway] (100.64.1.1)
         |
         | WAN: 203.0.113.10/30 (OLD) → 192.0.2.10/30 (NEW)
         |
@@ -89,7 +89,7 @@ Your ISP, **MegaNet Communications**, is undergoing a network restructure and ha
 ```
     [Internet]
         |
-    [ISP-B Gateway] (100.64.0.2)
+    [ISP-B Gateway] (100.64.2.1)
         |
         | WAN: 198.51.100.10/30 (OLD) → 192.0.2.20/30 (NEW)
         |

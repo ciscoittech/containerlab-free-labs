@@ -311,7 +311,7 @@ test_06_bgp_peering_established() {
     local tests_failed=0
 
     # Check router-a1 BGP session to internet-core
-    if exec_vtysh router-a1 "show bgp summary" | grep -q "Established"; then
+    if exec_vtysh router-a1 "show bgp neighbor" | grep -q "BGP state = Established"; then
         print_info "router-a1 BGP session to internet-core is ESTABLISHED"
         tests_passed=$((tests_passed + 1))
     else
@@ -321,7 +321,7 @@ test_06_bgp_peering_established() {
     fi
 
     # Check router-b1 BGP session to internet-core
-    if exec_vtysh router-b1 "show bgp summary" | grep -q "Established"; then
+    if exec_vtysh router-b1 "show bgp neighbor" | grep -q "BGP state = Established"; then
         print_info "router-b1 BGP session to internet-core is ESTABLISHED"
         tests_passed=$((tests_passed + 1))
     else
@@ -817,10 +817,12 @@ run_post_migration_tests() {
 run_quick_tests() {
     print_header "Enterprise VPN Migration Lab - Quick Validation Tests"
 
-    # Run only critical infrastructure tests (1, 5, 9)
+    # Critical path: containers, OSPF, GRE, cross-site DNS (1, 5, 9, 13) —
+    # matching what --help and the header comment have always advertised.
     test_01_all_containers_running || true
     test_05_ospf_adjacencies || true
     test_09_gre_tunnel_interfaces_exist || true
+    test_13_dns_resolution_cross_site || true
 }
 
 print_summary() {

@@ -592,7 +592,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "debug ospf event"
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show run | section bgp"
 
 # Check TCP connectivity
-docker exec clab-enterprise-vpn-migration-router-a1 ping 100.64.0.100
+docker exec clab-enterprise-vpn-migration-router-a1 ping 100.64.3.2
 
 # Debug BGP
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "debug bgp keepalives"

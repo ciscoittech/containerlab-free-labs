@@ -20,10 +20,10 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
-        - ip addr add 100.64.0.1/24 dev eth2
+        - ip addr add 100.64.1.1/30 dev eth2
         - ip addr add 203.0.113.9/30 dev eth1  # OLD IP range
         - apk add --no-cache iptables tcpdump curl
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.1.2'"
 
     # Router-A1 (Edge Router, VPN Endpoint, BGP)
     router-a1:
@@ -48,7 +48,7 @@ topology:
         - ip link set gre1 up
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
-        - ip addr add 100.64.0.10/24 dev eth3
+        - ip addr add 100.64.3.1/30 dev eth3
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
@@ -80,13 +80,25 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
+        - apk add --no-cache iproute2 iptables
         - sysctl -w net.ipv4.ip_forward=1
-        # Configure interfaces
-        - ip addr add 10.1.20.2/24 dev eth1
-        - ip addr add 10.1.20.3/24 dev eth2  # Web-A segment
-        - ip addr add 10.1.20.4/24 dev eth3  # DNS-A segment
-        - ip addr add 10.1.20.5/24 dev eth4  # LDAP-A segment
-        - ip addr add 10.1.20.6/24 dev eth5  # Monitor-A segment
+        # The service segment is a single L2 domain. Putting each port in the same
+        # /24 gave the kernel five connected routes for one prefix, so it answered
+        # for web-a out the router-facing port. Bridge the ports instead.
+        - ip link add name br0 type bridge
+        - ip link set eth1 master br0
+        - ip link set eth2 master br0
+        - ip link set eth3 master br0
+        - ip link set eth4 master br0
+        - ip link set eth5 master br0
+        - ip link set br0 up
+        # Every address the segment used before, now on the bridge, so each host
+        # keeps the gateway it was configured with.
+        - ip addr add 10.1.20.2/24 dev br0
+        - ip addr add 10.1.20.3/24 dev br0  # Web-A gateway
+        - ip addr add 10.1.20.4/24 dev br0  # DNS-A gateway
+        - ip addr add 10.1.20.5/24 dev br0  # LDAP-A gateway
+        - ip addr add 10.1.20.6/24 dev br0  # Monitor-A gateway
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.1'"
 
     # Web-A (nginx web server)
@@ -97,7 +109,9 @@ topology:
         - ip addr add 10.1.20.10/24 dev eth1
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
-        - echo '<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
+        # Alpine's stock default.conf returns 404 for everything and defines no root.
+        - "sh -c 'printf \"server {\\n  listen 80 default_server;\\n  root /var/www/localhost/htdocs;\\n  index index.html;\\n}\\n\" > /etc/nginx/http.d/default.conf'"
+        - "sh -c 'echo \"<html><body><h1>Welcome to Site A Web Server</h1><p>This is web-a (10.1.20.10)</p></body></html>\" > /var/www/localhost/htdocs/index.html'"
         - nginx
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.3'"
 
@@ -109,12 +123,12 @@ topology:
         - ip addr add 10.1.20.11/24 dev eth1
         - apk add --no-cache dnsmasq bind-tools
         # Configure dnsmasq
-        - echo "address=/web-a.site-a.local/10.1.20.10" > /etc/dnsmasq.conf
-        - echo "address=/web-b.site-b.local/10.2.20.10" >> /etc/dnsmasq.conf
-        - echo "address=/dns-a.site-a.local/10.1.20.11" >> /etc/dnsmasq.conf
-        - echo "address=/ldap-a.site-a.local/10.1.20.12" >> /etc/dnsmasq.conf
+        - "sh -c 'echo \"address=/web-a.site-a.local/10.1.20.10\" > /etc/dnsmasq.conf'"
+        - "sh -c 'echo \"address=/web-b.site-b.local/10.2.20.10\" >> /etc/dnsmasq.conf'"
+        - "sh -c 'echo \"address=/dns-a.site-a.local/10.1.20.11\" >> /etc/dnsmasq.conf'"
+        - "sh -c 'echo \"address=/ldap-a.site-a.local/10.1.20.12\" >> /etc/dnsmasq.conf'"
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.4'"
-        - dnsmasq --no-daemon --log-queries &
+        - "sh -c 'dnsmasq --log-queries'"   # daemonises itself
 
     # LDAP-A (OpenLDAP directory server)
     ldap-a:
@@ -128,7 +142,7 @@ topology:
         - chown ldap:ldap /var/lib/openldap/openldap-data
         # Note: Full LDAP config would be in production, simplified for lab
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.1.20.5'"
-        - nc -l -p 389 &  # Simple listener for connectivity testing
+        - "sh -c 'nohup nc -l -k -p 389 >/dev/null 2>&1 &'"  # stand-in LDAP listener
 
     # Monitor-A (monitoring dashboard placeholder)
     monitor-a:
@@ -149,10 +163,10 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
-        - ip addr add 100.64.0.2/24 dev eth2
+        - ip addr add 100.64.2.1/30 dev eth2
         - ip addr add 198.51.100.9/30 dev eth1  # OLD IP range
         - apk add --no-cache iptables tcpdump curl
-        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.0.254'"
+        - "sh -c 'ip route del default 2>/dev/null; ip route add default via 100.64.2.2'"
 
     # Router-B1 (Edge Router, VPN Endpoint, BGP)
     router-b1:
@@ -177,7 +191,7 @@ topology:
         - ip link set gre1 up
         - ip link set gre1 mtu 1400
         # Configure BGP peering IP
-        - ip addr add 100.64.0.20/24 dev eth3
+        - ip addr add 100.64.4.1/30 dev eth3
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:
@@ -209,11 +223,17 @@ topology:
       kind: linux
       image: alpine:3.22
       exec:
+        - apk add --no-cache iproute2 iptables
         - sysctl -w net.ipv4.ip_forward=1
-        # Configure interfaces
-        - ip addr add 10.2.20.2/24 dev eth1
-        - ip addr add 10.2.20.3/24 dev eth2  # Web-B segment
-        - ip addr add 10.2.20.4/24 dev eth3  # Server-B segment
+        # Same single-L2-domain fix as firewall-a.
+        - ip link add name br0 type bridge
+        - ip link set eth1 master br0
+        - ip link set eth2 master br0
+        - ip link set eth3 master br0
+        - ip link set br0 up
+        - ip addr add 10.2.20.2/24 dev br0
+        - ip addr add 10.2.20.3/24 dev br0  # Web-B gateway
+        - ip addr add 10.2.20.4/24 dev br0  # Server-B gateway
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.1'"
 
     # Web-B (nginx web server)
@@ -224,7 +244,9 @@ topology:
         - ip addr add 10.2.20.10/24 dev eth1
         - apk add --no-cache nginx curl bind-tools netcat-openbsd traceroute
         - mkdir -p /run/nginx
-        - echo '<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>' > /usr/share/nginx/html/index.html
+        # Alpine's stock default.conf returns 404 for everything and defines no root.
+        - "sh -c 'printf \"server {\\n  listen 80 default_server;\\n  root /var/www/localhost/htdocs;\\n  index index.html;\\n}\\n\" > /etc/nginx/http.d/default.conf'"
+        - "sh -c 'echo \"<html><body><h1>Welcome to Site B Web Server</h1><p>This is web-b (10.2.20.10)</p></body></html>\" > /var/www/localhost/htdocs/index.html'"
         - nginx
         - "sh -c 'ip route del default 2>/dev/null; ip route add default via 10.2.20.3'"
 
@@ -254,11 +276,11 @@ topology:
       exec:
         - sysctl -w net.ipv4.ip_forward=1
         # Configure ISP backbone network
-        - ip addr add 100.64.0.254/24 dev eth1
-        - ip addr add 100.64.0.253/24 dev eth2
+        - ip addr add 100.64.1.2/30 dev eth1
+        - ip addr add 100.64.2.2/30 dev eth2
         # Configure BGP peering IPs
-        - ip addr add 100.64.0.100/24 dev eth3  # Peering to router-a1
-        - ip addr add 100.64.0.101/24 dev eth4  # Peering to router-b1
+        - ip addr add 100.64.3.2/30 dev eth3  # Peering to router-a1
+        - ip addr add 100.64.4.2/30 dev eth4  # Peering to router-b1
         # Remove mgmt default route so FRR routing takes over
         - "sh -c 'ip route del default via 172.20.25.1 2>/dev/null; true'"
       binds:

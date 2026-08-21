@@ -385,7 +385,7 @@ docker exec clab-enterprise-vpn-migration-router-a2 vtysh -c "conf t" \
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show bgp summary"
 
 # Check TCP connectivity to BGP peer
-docker exec clab-enterprise-vpn-migration-router-a1 ping 100.64.0.100
+docker exec clab-enterprise-vpn-migration-router-a1 ping 100.64.3.2
 
 # Check BGP configuration
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show run | section bgp"
@@ -406,10 +406,10 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "debug bgp updates"
 docker exec clab-enterprise-vpn-migration-router-a1 ip addr show eth3
 
 # Add missing IP if needed
-docker exec clab-enterprise-vpn-migration-router-a1 ip addr add 100.64.0.10/24 dev eth3
+docker exec clab-enterprise-vpn-migration-router-a1 ip addr add 100.64.3.1/30 dev eth3
 
 # Test ping to peer
-docker exec clab-enterprise-vpn-migration-router-a1 ping -c 3 100.64.0.100
+docker exec clab-enterprise-vpn-migration-router-a1 ping -c 3 100.64.3.2
 ```
 
 **Solution 3.1b: Incorrect Neighbor Configuration**
@@ -417,7 +417,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 ping -c 3 100.64.0.100
 # Fix neighbor IP address
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" \
   -c "router bgp 64512" \
-  -c "neighbor 100.64.0.100 remote-as 65000" \
+  -c "neighbor 100.64.3.2 remote-as 65000" \
   -c "end"
 ```
 
@@ -427,7 +427,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" \
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" \
   -c "router bgp 64512" \
   -c "address-family ipv4 unicast" \
-  -c "neighbor 100.64.0.100 activate" \
+  -c "neighbor 100.64.3.2 activate" \
   -c "end"
 ```
 
@@ -452,7 +452,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" \
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show bgp ipv4 unicast"
 
 # Check what's being advertised to neighbor
-docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show bgp ipv4 unicast neighbors 100.64.0.100 advertised-routes"
+docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show bgp ipv4 unicast neighbors 100.64.3.2 advertised-routes"
 
 # Check route-maps
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show route-map"
@@ -482,7 +482,7 @@ docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "show run | section
 docker exec clab-enterprise-vpn-migration-router-a1 vtysh -c "conf t" \
   -c "router bgp 64512" \
   -c "address-family ipv4 unicast" \
-  -c "no neighbor 100.64.0.100 route-map SITE-A-OUT out" \
+  -c "no neighbor 100.64.3.2 route-map SITE-A-OUT out" \
   -c "end"
 
 # Clear BGP session to apply
